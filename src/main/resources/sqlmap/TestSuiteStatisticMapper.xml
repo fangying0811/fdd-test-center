@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fangdd.testcenter.mapper.TestSuiteStatisticMapper">
+	<resultMap id="TestSuiteStatisticMap" type="TestSuiteStatistic">
+		<id property="id" column="id" />
+		<result property="serviceId" column="service_id" />
+		<result property="env" column="env" />
+		<result property="departmentId" column="department_id" />
+		<result property="teamId" column="team_id" />
+		<result property="startTime" column="start_time" />
+		<result property="endTime" column="end_time" />
+		<result property="durationTime" column="duration_time" />
+		<result property="passed" column="passed" />
+		<result property="failed" column="failed" />
+		<result property="skipped" column="skipped" />
+		<result property="total" column="total" />
+		<result property="status" column="status" />
+		<result property="createTime" column="create_time" />
+		<result property="updateTime" column="update_time" />
+	</resultMap>
+
+	<sql id="TestSuiteStatisticColumnSQL">
+		t_test_sutie_statistic.id,
+		t_test_sutie_statistic.service_id,
+		t_test_sutie_statistic.env,
+		t_test_sutie_statistic.department_id,
+		t_test_sutie_statistic.team_id,
+		t_test_sutie_statistic.start_time,
+		t_test_sutie_statistic.end_time,
+		t_test_sutie_statistic.duration_time,
+		t_test_sutie_statistic.passed,
+		t_test_sutie_statistic.failed,
+		t_test_sutie_statistic.skipped,
+		t_test_sutie_statistic.total,
+		t_test_sutie_statistic.status,
+		t_test_sutie_statistic.create_time,
+		t_test_sutie_statistic.update_time
+	</sql>
+
+	<sql id="joinSql">
+		from t_test_sutie_statistic
+	</sql>
+
+	<sql id="selectConditionSql">
+		<if test="testSuiteStatistic.departmentId>0">
+			and
+			t_test_sutie_statistic.department_id=#{testSuiteStatistic.departmentId}
+		</if>
+		<if test="testSuiteStatistic.teamId >0">
+			and
+			t_test_sutie_statistic.team_id=#{testSuiteStatistic.teamId}
+		</if>
+		<if test="testSuiteStatistic.serviceId> 0">
+			and
+			t_test_sutie_statistic.service_id=#{testSuiteStatistic.serviceId}
+		</if>
+		<if test="testSuiteStatistic.status> 0">
+			and
+			t_test_sutie_statistic.status=#{testSuiteStatistic.status}
+		</if>
+	</sql>
+	
+	<sql id="getTestSuiteStatisticIdConditionSql">
+		<if test="testSuiteStatistic.serviceId> 0">
+			and
+			t_test_sutie_statistic.service_id=#{testSuiteStatistic.serviceId}
+		</if>
+		<if test="testSuiteStatistic.startTime != null and testSuiteStatistic.startTime !=''">
+			and
+			t_test_sutie_statistic.start_time =
+			#{testSuiteStatistic.startTime}
+		</if>
+		<if test="testSuiteStatistic.endTime != null and testSuiteStatistic.endTime !=''">
+			and
+			t_test_sutie_statistic.end_time =
+			#{testSuiteStatistic.endTime}
+		</if>
+	</sql>
+
+	<insert id="addTestSuiteStatistic" useGeneratedKeys="true"
+		keyProperty="testSuiteStatistic.id">
+		insert into t_test_sutie_statistic (
+		service_id,
+		env,
+		department_id,
+		team_id,
+		start_time,
+		end_time,
+		duration_time,
+		passed,
+		failed,
+		skipped,
+		total,
+		status,
+		create_time,
+		update_time
+		) values (
+		#{testSuiteStatistic.serviceId},
+		#{testSuiteStatistic.env},
+		#{testSuiteStatistic.departmentId},
+		#{testSuiteStatistic.teamId},
+		#{testSuiteStatistic.startTime},
+		#{testSuiteStatistic.endTime},
+		#{testSuiteStatistic.durationTime},
+		#{testSuiteStatistic.passed},
+		#{testSuiteStatistic.failed},
+		#{testSuiteStatistic.skipped},
+		#{testSuiteStatistic.total},
+		#{testSuiteStatistic.status},
+		NOW(),
+		NOW()
+		)
+	</insert>
+
+	<select id="getTestSuiteStatisticById" resultMap="TestSuiteStatisticMap">
+		select
+		<include refid="TestSuiteStatisticColumnSQL" />
+		<include refid="joinSql" />
+		where
+		t_test_sutie_statistic.id=#{id}
+	</select>
+
+	<select id="getTestSuiteStatisticList" resultMap="TestSuiteStatisticMap">
+		select
+		<include refid="TestSuiteStatisticColumnSQL" />
+		<include refid="joinSql" />
+		where
+		1 = 1
+		<include refid="selectConditionSql" />
+		order by
+		t_test_sutie_statistic.create_time desc
+		limit
+		#{begin},#{size}
+	</select>
+
+	<select id="getTestSuiteStatisticCount" resultType="int">
+		select count(1)
+		<include refid="joinSql" />
+		where
+		1 = 1
+		<include refid="selectConditionSql" />
+	</select>
+	
+	<select id="getTestSuiteStatisticId" resultType="long">
+		select id
+		<include refid="joinSql" />
+		where
+		1 = 1
+		<include refid="getTestSuiteStatisticIdConditionSql" />
+	</select>
+	
+	<delete id="deleteTestSuiteStatisticById">
+		delete from
+		t_test_sutie_statistic
+		where
+		t_test_sutie_statistic.id=#{id}
+	</delete>
+</mapper> 

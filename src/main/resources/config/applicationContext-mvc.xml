@@ -1,0 +1,67 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+      http://www.springframework.org/schema/beans/spring-beans.xsd
+      http://www.springframework.org/schema/context
+      http://www.springframework.org/schema/context/spring-context.xsd
+      http://www.springframework.org/schema/mvc
+      http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+	<!-- 启动注解驱动的Spring MVC功能 -->
+	<mvc:annotation-driven>
+		<mvc:message-converters register-defaults="true">
+			<bean
+				class="com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter">
+				<property name="supportedMediaTypes">
+					<list>
+						<value>application/json;charset=UTF-8</value>
+						<value>text/html;charset=UTF-8</value><!-- 避免IE出现下载JSON文件的情况 -->
+					</list>
+				</property>
+				<property name="features">
+					<list>
+						<value>QuoteFieldNames</value>
+						<value>WriteDateUseDateFormat</value>
+					</list>
+				</property>
+			</bean>
+		</mvc:message-converters>
+		<mvc:argument-resolvers>
+			<bean class="com.fangdd.testcenter.core.FastjsonArgumentResolver">
+				<property name="parameterKey" value="body" />
+			</bean>
+		</mvc:argument-resolvers>
+	</mvc:annotation-driven>
+
+	<!-- 启动包扫描功能 -->
+	<context:component-scan base-package="com.fangdd.testcenter.controller" />
+
+	<mvc:resources mapping="/images/**" location="/images/" />
+	<mvc:resources mapping="/scripts/**" location="/scripts/" />
+	<mvc:resources mapping="/views/**" location="/views/" />
+	<mvc:resources mapping="/*.jsp" location="/" />
+
+	<!-- spring Mapping View -->
+	<bean class="org.springframework.web.servlet.view.UrlBasedViewResolver">
+		<property name="viewClass"
+			value="org.springframework.web.servlet.view.JstlView"></property>
+		<!-- 配置jsp路径前缀 -->
+		<property name="prefix" value="/WEB-INF/"></property>
+		<!-- 配置URl后缀 -->
+		<property name="suffix" value=".jsp"></property>
+	</bean>
+
+	<!-- 多部分文件上传 -->
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="maxUploadSize" value="104857600" />
+		<property name="maxInMemorySize" value="4096" />
+		<property name="defaultEncoding" value="UTF-8"></property>
+	</bean>
+
+	<mvc:interceptors>
+		<bean
+			class="com.fangdd.testcenter.core.session.SessionCheckHandlerInterceptor" />
+	</mvc:interceptors>
+</beans>

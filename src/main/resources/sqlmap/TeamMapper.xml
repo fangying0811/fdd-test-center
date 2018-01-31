@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fangdd.testcenter.mapper.TeamMapper">
+	<resultMap id="TeamResultMap" type="Team">
+		<id property="teamId" column="id" />
+		<result property="name" column="name" />
+		<result property="developer" column="developer" />
+		<result property="tester" column="tester" />
+		<result property="createTime" column="create_time" />
+		<result property="updateTime" column="update_time" />
+		<association property="department" javaType="Department">
+			<id property="departmentId" column="departmentId" />
+			<result property="name" column="departmentName" />
+		</association>
+	</resultMap>
+
+	<sql id="TeamColumnSQL">
+		t_team.id,
+		t_team.name,
+		t_team.developer,
+		t_team.tester,
+		t_team.create_time,
+	    t_team.update_time
+	</sql>
+
+	<sql id="DepartmentColumnSQL">
+		t_department.id as departmentId,
+		t_department.name as
+		departmentName
+	</sql>
+
+	<sql id="joinSql">
+		from t_team
+		left join t_department
+		on
+		t_team.department_id=t_department.id
+	</sql>
+	
+	<sql id="queryConditionSql">
+		<if test="team.name != null and team.name !=''">
+			and t_team.name like
+			'%${team.name}%'
+		</if>
+		<if test="team.department != null and team.department.departmentId >0">
+			and
+			t_team.department_id=#{team.department.departmentId}
+		</if>
+	</sql>
+	
+
+	<insert id="addTeam" useGeneratedKeys="true" keyProperty="team.teamId">
+		insert
+		into t_team(
+		department_id,
+		name,
+		developer,
+		tester,
+	    create_time,
+	    update_time
+		)
+		values(
+		#{team.department.departmentId},
+		#{team.name},
+		#{team.developer},
+		#{team.tester},
+		NOW(),
+	    NOW()
+		)
+	</insert>
+
+	<update id="updateTeam">
+		update t_team
+		set
+		t_team.name=#{team.name},
+		t_team.department_id=#{team.department.departmentId},
+		t_team.developer=#{team.developer},
+		t_team.tester=#{team.tester},
+		t_team.update_time = NOW()
+		where
+		t_team.id
+		=#{team.teamId}
+	</update>
+
+	<delete id="deleteTeam">
+		delete from
+		t_team
+		where
+		t_team.id=#{teamId}
+	</delete>
+
+	<select id="getTeamCount" resultType="int">
+		select count(1)
+		<include refid="joinSql" />
+		where
+		1 = 1
+		<include refid="queryConditionSql" />
+	</select>
+
+	<select id="getTeamList" resultMap="TeamResultMap">
+		select
+		<include refid="TeamColumnSQL" />
+		,
+		<include refid="DepartmentColumnSQL" />
+		<include refid="joinSql" />
+		where
+		1 = 1
+		<include refid="queryConditionSql" />
+		order by t_team.create_time desc
+		limit
+		#{begin},#{size}
+	</select>
+
+	<select id="getTeamListByDepartmentId" resultMap="TeamResultMap">
+		select
+		<include refid="TeamColumnSQL" />
+		,
+		<include refid="DepartmentColumnSQL" />
+		<include refid="joinSql" />
+		where
+		t_team.department_id=#{departmentId}
+		order by t_team.create_time desc
+	</select>
+	
+	<select id="getTeamListAll" resultMap="TeamResultMap">
+		select
+		<include refid="TeamColumnSQL" />
+		,
+		<include refid="DepartmentColumnSQL" />
+		<include refid="joinSql" />
+		order by t_team.create_time desc
+	</select>
+
+	<select id="getTeamCountByName" resultType="int">
+		select count(1)
+		<include refid="joinSql" />
+		where
+		t_team.name =#{name}
+	</select>
+
+	<select id="getTeamById" resultMap="TeamResultMap">
+		select
+		<include refid="TeamColumnSQL" />
+		,
+		<include refid="DepartmentColumnSQL" />
+		<include refid="joinSql" />
+		where
+		t_team.id=#{teamId}
+	</select>
+	
+	<select id="getTeamCountByDepartmentId" resultType="int">
+		select count(1)
+		<include refid="joinSql" />
+		where
+		t_team.department_id=#{departmentId}
+	</select>
+</mapper> 

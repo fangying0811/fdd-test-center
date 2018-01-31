@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fangdd.testcenter.mapper.DepartmentMapper">
+	<resultMap id="DepartmentResultMap" type="Department">
+		<id property="departmentId" column="id" />
+		<result property="name" column="name" />
+		<result property="remark" column="remark" />
+		<result property="createTime" column="create_time" />
+		<result property="updateTime" column="update_time" />
+	</resultMap>
+	<sql id="DepartmentColumnSQL">
+		t_department.id,
+		t_department.name,
+		t_department.remark,
+		t_department.create_time,
+	    t_department.update_time
+	</sql>
+	<select id="getDepartmentCount" resultType="int">
+		select count(1) from
+		t_department
+		where
+		1 = 1
+		<if test="department.name != null and department.name !=''">
+			and t_department.name like '%${department.name}%'
+		</if>
+	</select>
+	<select id="getDepartmentListByPage" resultMap="DepartmentResultMap">
+		select
+		<include refid="DepartmentColumnSQL" />
+		from t_department
+		where
+		1 = 1
+		<if test="department.name != null and department.name !=''">
+			and t_department.name like '%${department.name}%'
+		</if>
+		order by t_department.create_time desc
+		limit
+		#{begin},#{size}
+	</select>
+	<select id="getDepartmentListAll" resultMap="DepartmentResultMap">
+		select
+		<include refid="DepartmentColumnSQL" />
+		from t_department
+		order by t_department.create_time desc
+	</select>
+	<select id="getDepartmentById" resultMap="DepartmentResultMap">
+		select
+		<include refid="DepartmentColumnSQL" />
+		from t_department
+		where
+		t_department.id=#{departmentId}
+	</select>
+	<select id="getDepartmentByName" resultMap="DepartmentResultMap">
+		select
+		<include refid="DepartmentColumnSQL" />
+		from t_department
+		where
+		t_department.name=#{name}
+	</select>
+	<insert id="addDepartment" useGeneratedKeys="true"
+		keyProperty="department.departmentId">
+		insert into t_department(
+		name,
+		remark,
+	    create_time,
+	    update_time
+		)
+		values(
+		#{department.name},
+		#{department.remark},
+		NOW(),
+	    NOW()
+		)
+	</insert>
+	<update id="updateDepartment">
+		update t_department
+		set
+		t_department.name
+		=#{department.name},
+		t_department.remark =
+		#{department.remark},
+		t_department.update_time = NOW()
+		where
+		t_department.id = #{department.departmentId}
+	</update>
+	<delete id="deleteDepartment">
+		delete from
+		t_department
+		where
+		t_department.id=#{departmentId}
+	</delete>
+</mapper> 

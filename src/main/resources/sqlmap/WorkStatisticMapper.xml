@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fangdd.testcenter.mapper.WorkStatisticMapper">
+	<resultMap id="WorkStatisticResultMap" type="WorkStatistic">
+		<result property="versionCount" column="versionCount" />
+		<result property="caseCount" column="caseCount" />
+		<result property="bugCount" column="bugCount" />
+		<result property="bugCritical" column="bugCritical" />
+		<association property="department" javaType="Department">
+			<id property="departmentId" column="departmentId" />
+			<result property="name" column="departmentName" />
+		</association>
+		<association property="team" javaType="Team">
+			<id property="teamId" column="teamId" />
+			<result property="name" column="teamName" />
+		</association>
+	</resultMap>
+	<sql id="DepartmentColumnSQL">
+		t_department.id as departmentId,
+		t_department.name as
+		departmentName
+	</sql>
+	<sql id="TeamColumnSQL">
+		t_team.id as teamId,
+		t_team.name as teamName
+	</sql>
+	<sql id="joinSql">
+		from t_weekly_report
+		left join t_department
+		on
+		t_weekly_report.department_id=t_department.id
+		left join t_team
+		on
+		t_weekly_report.team_id=t_team.id
+	</sql>
+	<sql id="selectConditionSql">
+		and t_weekly_report.test_status=3
+		and t_weekly_report.type in (1,3,4)
+		<if
+			test="workStatistic.department != null and workStatistic.department.departmentId >0">
+			and
+			t_weekly_report.department_id=#{workStatistic.department.departmentId}
+		</if>
+		<if test="workStatistic.team !=null and workStatistic.team.teamId>0">
+			and
+			t_weekly_report.team_id=#{workStatistic.team.teamId}
+		</if>
+		<if test="workStatistic.startTime != null and workStatistic.startTime !=''">
+			and
+			t_weekly_report.version_release_time &gt;=
+			#{workStatistic.startTime}
+		</if>
+		<if test="workStatistic.endTime != null and workStatistic.endTime !=''">
+			and
+			t_weekly_report.version_release_time &lt;=
+			#{workStatistic.endTime}
+		</if>
+	</sql>
+	<select id="getTeamWorkStatisticList" resultMap="WorkStatisticResultMap">
+		select
+		count(1) as versionCount,
+		sum(t_weekly_report.case_number) as
+		caseCount,
+		sum(t_weekly_report.bug_number) as bugCount,
+		sum(t_weekly_report.bug_critical) as bugCritical,
+		<include refid="DepartmentColumnSQL" />
+		,
+		<include refid="TeamColumnSQL" />
+		<include refid="joinSql" />
+		where
+		1 = 1
+		<include refid="selectConditionSql" />
+		group by departmentId,departmentName,teamId,teamName
+		order by
+		t_weekly_report.department_id desc,
+		t_weekly_report.team_id desc
+	</select>
+	<select id="getTeamWorkStatistic" resultMap="WorkStatisticResultMap">
+		select
+		count(1) as versionCount,
+		sum(t_weekly_report.case_number) as
+		caseCount,
+		sum(t_weekly_report.bug_number) as bugCount,
+		<include refid="DepartmentColumnSQL" />
+		,
+		<include refid="TeamColumnSQL" />
+		<include refid="joinSql" />
+		where
+		t_weekly_report.test_status=3
+		and
+		t_weekly_report.team_id=#{teamId}
+		<if test="versionTypeList != null and versionTypeList !=''">
+			and t_weekly_report.type in (${versionTypeList})
+		</if>
+		<if test="versionType>0">
+			and t_weekly_report.type =#{versionType}
+		</if>
+		<if test="startTime != null and startTime !=''">
+			and
+			t_weekly_report.version_release_time &gt;=
+			#{startTime}
+		</if>
+		<if test="endTime != null and endTime !=''">
+			and
+			t_weekly_report.version_release_time &lt;=
+			#{endTime}
+		</if>
+		group by departmentId,departmentName,teamId,teamName
+		order by
+		t_weekly_report.department_id desc,
+		t_weekly_report.team_id desc
+	</select>
+	<select id="getDepartmentWorkStatisticList" resultMap="WorkStatisticResultMap">
+		select
+		count(1) as versionCount,
+		sum(t_weekly_report.case_number) as
+		caseCount,
+		sum(t_weekly_report.bug_number) as bugCount,
+		sum(t_weekly_report.bug_critical) as bugCritical,
+		<include refid="DepartmentColumnSQL" />
+		<include refid="joinSql" />
+		where
+		1 = 1
+		<include refid="selectConditionSql" />
+		group by departmentId,departmentName
+		order by
+		t_weekly_report.department_id desc
+	</select>
+</mapper> 

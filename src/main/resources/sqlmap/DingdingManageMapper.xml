@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+      <mapper namespace="com.fangdd.testcenter.mapper.DingdingManageMapper">
+      <resultMap id="DingdingManageMap" type="DingdingManage">
+      <id property="dManageId" column="id" />
+      <result property="chatId" column="chat_id" />
+      <result property="groupName" column="group_name" />
+      <result property="createTime" column="create_time" />
+	  <result property="updateTime" column="update_time" />
+	  <result property="userId" column="user_id" />  
+	  <result property="userMobile" column="user_mobile" /> 
+	  </resultMap>
+	
+	<sql id="DingdingManageColumnSQL">
+	    t_dingdingmanage.id,
+	    t_dingdingmanage.chat_id,
+	    t_dingdingmanage.user_id,
+	    t_dingdingmanage.user_mobile,
+	    t_dingdingmanage.group_name,
+	    t_dingdingmanage.create_time,
+	    t_dingdingmanage.update_time
+	</sql>
+	
+	<insert id="addDingdingManage" useGeneratedKeys="true" keyProperty="dManage.dManageId">
+	    insert into t_dingdingmanage (
+	    chat_id,
+	    group_name,
+	    user_id,
+	    user_mobile,
+	    create_time,
+	    update_time
+	    ) 
+	    values (
+	    #{dManage.chatId},
+	    #{dManage.groupName},
+	    #{dManage.userId},
+	    #{dManage.userMobile},
+	    NOW(),
+	    NOW()
+	    )
+	</insert>
+	
+	<update id="updateDingdingManage">
+	    update t_dingdingmanage
+	    set
+	    t_dingdingmanage.chat_id = #{dManage.chatId},
+	    t_dingdingmanage.group_name = #{dManage.groupName},
+	    t_dingdingmanage.user_id = #{dManage.userId},
+	    t_dingdingmanage.user_id = #{dManage.userMobile},
+	    t_dingdingmanage.update_time = NOW()
+	    where
+	    t_dingdingmanage.id = #{dManage.dManageId};
+	</update>
+	
+	<delete id="deleteDingdingManage">
+	    delete from 
+	    t_dingdingmanage
+	    where 
+	    t_dingdingmanage.id = #{dManageId}
+	</delete>
+	
+	<select id="getDingdingManageCount" resultType="int">
+	    select count(1)
+	    from t_dingdingmanage
+	    where 1 = 1
+	</select>
+	
+	<select id="getDingdingManageList" resultMap="DingdingManageMap">
+	    select
+	    <include refid="DingdingManageColumnSQL" />
+	    from t_dingdingmanage
+	    where 1 = 1
+	    order by t_dingdingmanage.create_time desc
+	    limit #{begin},#{size}
+	</select>
+	
+	<select id="getDingdingManageById" resultMap="DingdingManageMap">
+	   select
+	   <include refid="DingdingManageColumnSQL" />
+	   from t_dingdingmanage
+	   where 
+	   t_dingdingmanage.id = #{dManageId}
+	</select>
+	
+	<select id="getDingdingManageByGroupName" resultType="int">
+	  select
+	  <include refid="DingdingManageColumnSQL" />
+	   from t_dingdingmanage
+	   where 
+	   t_dingdingmanage.group_name = #{groupName}
+	</select>
+</mapper>

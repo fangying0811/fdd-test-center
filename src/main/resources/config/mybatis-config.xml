@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" 
+         "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<typeAliases>
+		<typeAlias alias="User" type="com.fangdd.testcenter.bean.User" />
+		<typeAlias alias="Department" type="com.fangdd.testcenter.bean.Department" />
+		<typeAlias alias="Menu" type="com.fangdd.testcenter.bean.Menu" />
+		<typeAlias alias="ProjectInfo" type="com.fangdd.testcenter.bean.ProjectInfo" />
+		<typeAlias alias="Team" type="com.fangdd.testcenter.bean.Team" />
+		<typeAlias alias="RequirementInfo"
+			type="com.fangdd.testcenter.bean.RequirementInfo" />
+		<typeAlias alias="WeeklyReport" type="com.fangdd.testcenter.bean.WeeklyReport" />
+		<typeAlias alias="OnlineIssue" type="com.fangdd.testcenter.bean.OnlineIssue" />
+		<typeAlias alias="OutstandingIssue"
+			type="com.fangdd.testcenter.bean.OutstandingIssue" />
+		<typeAlias alias="WorkStatistic" type="com.fangdd.testcenter.bean.WorkStatistic" />
+		<typeAlias alias="ProjectWorkStatistic"
+			type="com.fangdd.testcenter.bean.ProjectWorkStatistic" />
+		<typeAlias alias="DingdingManage" type="com.fangdd.testcenter.bean.DingdingManage" />
+		<typeAlias alias="TestReport" type="com.fangdd.testcenter.bean.TestReport" />
+		<typeAlias alias="AutomationProject" type="com.fangdd.testcenter.bean.AutomationProject" />
+		<typeAlias alias="TestSuiteStatistic"
+			type="com.fangdd.testcenter.bean.TestSuiteStatistic" />
+		<typeAlias alias="TestStatistic" type="com.fangdd.testcenter.bean.TestStatistic" />
+	</typeAliases>
+</configuration>

@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fangdd.testcenter.mapper.UserMapper">
+	<resultMap id="UserResultMap" type="User">
+		<id property="userId" column="id" />
+		<result property="username" column="username" />
+		<result property="password" column="password" />
+		<result property="trueName" column="true_name" />
+		<result property="email" column="email" />
+		<result property="status" column="status" />
+		<result property="isAdmin" column="is_admin" />
+		<result property="createTime" column="create_time" />
+		<result property="updateTime" column="update_time" />
+		<association property="department" javaType="Department">
+			<id property="departmentId" column="departmentId" />
+			<result property="name" column="departmentName" />
+		</association>
+		<association property="team" javaType="Team">
+			<id property="teamId" column="teamId" />
+			<result property="name" column="teamName" />
+		</association>
+	</resultMap>
+	<sql id="UserColumnSQL">
+		t_user.id,
+		t_user.username,
+		t_user.password,
+		t_user.true_name,
+		t_user.email,
+		t_user.status,
+		t_user.is_admin,
+		t_user.create_time,
+	    t_user.update_time
+	</sql>
+	<sql id="DepartColumnSQL">
+		t_department.id as departmentId,
+		t_department.name as
+		departmentName
+	</sql>
+	<sql id="TeamColumnSQL">
+		t_team.id as teamId,
+		t_team.name as teamName
+	</sql>
+	<sql id="joinSql">
+		from t_user
+		left join t_department
+		on
+		t_user.department_id=t_department.id
+		left join t_team
+		on
+		t_user.team_id=t_team.id
+	</sql>
+	<sql id="conditionSql">
+		<if test="user.username != null and user.username !=''">
+			and t_user.username like '%${user.username}%'
+		</if>
+		<if test="user.trueName != null and user.trueName !=''">
+			and t_user.true_name like '%${user.trueName}%'
+		</if>
+		<if test="user.department != null and user.department.departmentId>0">
+			and t_user.department_id =#{user.department.departmentId}
+		</if>
+		<if test="user.team != null and user.team.teamId>0">
+			and t_user.team_id =#{user.team.teamId}
+		</if>
+	</sql>
+	<select id="getUserByUsername" resultMap="UserResultMap">
+		select
+		<include refid="UserColumnSQL" />
+		,
+		<include refid="DepartColumnSQL" />
+		,
+		<include refid="TeamColumnSQL" />
+		<include refid="joinSql" />
+		where
+		t_user.username = #{username}
+	</select>
+	<select id="getUserById" resultMap="UserResultMap">
+		select
+		<include refid="UserColumnSQL" />
+		,
+		<include refid="DepartColumnSQL" />
+		,
+		<include refid="TeamColumnSQL" />
+		<include refid="joinSql" />
+		where t_user.id=#{userId}
+	</select>
+	<select id="getUserCountByDepartmentId" resultType="int">
+		select
+		count(1)
+		from
+		t_user
+		where
+		t_user.department_id =
+		#{departmentId}
+	</select>
+	<select id="getUserCountByTeamId" resultType="int">
+		select
+		count(1)
+		from
+		t_user
+		where
+		t_user.team_id =
+		#{teamId}
+	</select>
+	<select id="getUserCount" resultType="int">
+		select count(1)
+		<include refid="joinSql" />
+		where
+		1 = 1
+		<include refid="conditionSql" />
+		and t_user.id!=1
+	</select>
+	<select id="getUserListByPage" resultMap="UserResultMap">
+		select
+		<include refid="UserColumnSQL" />
+		,
+		<include refid="DepartColumnSQL" />
+		,
+		<include refid="TeamColumnSQL" />
+		<include refid="joinSql" />
+		where
+		1 = 1
+		<include refid="conditionSql" />
+		and t_user.id!=1
+		order by t_user.create_time desc
+		limit
+		#{begin},#{size}
+	</select>
+	<select id="getSelcetUserCount" resultType="int">
+		select count(1)
+		<include refid="joinSql" />
+		where
+		1 = 1
+		<include refid="conditionSql" />
+		and t_user.id!=1
+		and t_user.status =0
+	</select>
+	<select id="getSelcetUserListByPage" resultMap="UserResultMap">
+		select
+		<include refid="UserColumnSQL" />
+		,
+		<include refid="DepartColumnSQL" />
+		,
+		<include refid="TeamColumnSQL" />
+		<include refid="joinSql" />
+		where
+		1 = 1
+		<include refid="conditionSql" />
+		and t_user.id!=1
+		and t_user.status =0
+		order by t_user.create_time desc
+		limit
+		#{begin},#{size}
+	</select>
+	<!-- useGeneratedKeys:是否返回数据库生成的标识列值 keyProperty:如果返回了数据库生成的标识列值，则该值存储在返回对象的哪个属性里，本例为user对象的userId属性 -->
+	<insert id="addUser" useGeneratedKeys="true" keyProperty="user.userId">
+		insert
+		into t_user(
+		username,
+		password,
+		true_name,
+		email,
+		status,
+		is_admin,
+		department_id,
+		team_id,
+	    create_time,
+	    update_time
+		)
+		values(
+		#{user.username},
+		#{user.password},
+		#{user.trueName},
+		#{user.email},
+		#{user.status},
+		#{user.isAdmin},
+		#{user.department.departmentId},
+		#{user.team.teamId},
+		NOW(),
+	    NOW()
+		)
+	</insert>
+	<update id="updateUser">
+		update
+		t_user
+		set
+		t_user.username = #{user.username}
+		<if test="user.password != null and user.password !=''">
+			, t_user.password = #{user.password}
+		</if>
+		<if test="user.trueName != null and user.trueName !=''">
+			, t_user.true_name = #{user.trueName}
+		</if>
+		<if test="user.email != null and user.email !=''">
+			, t_user.email = #{user.email}
+		</if>
+		<if test="user.status != null">
+			, t_user.status = #{user.status}
+		</if>
+		<if test="user.isAdmin != null">
+			, t_user.is_admin = #{user.isAdmin}
+		</if>
+		<if test="user.department!= null and user.department.departmentId>0">
+			, t_user.department_id = #{user.department.departmentId}
+		</if>
+		<if test="user.team!= null and user.team.teamId>0">
+			, t_user.team_id = #{user.team.teamId}
+		</if>
+		,t_user.update_time = NOW()
+		where
+		t_user.id = #{user.userId}
+	</update>
+	<update id="updateUserPwd">
+		update
+		t_user
+		set
+		t_user.password = #{user.password}
+		where
+		t_user.id = #{user.userId}
+	</update>
+	<delete id="deleteUser">
+		delete from
+		t_user
+		where
+		t_user.id=#{userId}
+	</delete>
+
+	<select id="getUserListByDepartmentId" resultMap="UserResultMap">
+		select
+		<include refid="UserColumnSQL" />
+		,
+		<include refid="DepartColumnSQL" />
+		,
+		<include refid="TeamColumnSQL" />
+		<include refid="joinSql" />
+		where
+		t_user.department_id=#{departmentId}
+		order by t_user.create_time desc
+	</select>
+
+	<select id="getUserListAll" resultMap="UserResultMap">
+		select
+		<include refid="UserColumnSQL" />
+		,
+		<include refid="DepartColumnSQL" />
+		,
+		<include refid="TeamColumnSQL" />
+		<include refid="joinSql" />
+		where
+		1 = 1
+		and t_user.status =0
+		and t_user.id!=1
+		order by t_user.create_time desc
+	</select>
+</mapper> 

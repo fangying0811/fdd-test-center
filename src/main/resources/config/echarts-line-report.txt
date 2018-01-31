@@ -1,0 +1,30 @@
+{
+    title: {
+        text: '%1$s'
+    },
+    tooltip: {
+        trigger: 'axis'
+    },
+    legend: {
+        data:%2$s
+    },
+    toolbox: {
+        feature : {
+				mark : {show: true},
+				dataView : {show: true, readOnly: false},
+				magicType : {show: true, type: ['line', 'bar']},
+				restore : {show: true},
+				saveAsImage : {show: true}
+			}
+    },
+    xAxis: {
+        type: 'category',
+        boundaryGap: false,
+        data: %3$s
+    },
+    yAxis: {
+        type: 'value',
+    },
+    series: %4$s,
+    color: %5$s
+}

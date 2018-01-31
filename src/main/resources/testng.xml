@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<!-- thread-count="1" 为同时执行的线程数 parallel="tests" 为同时执行的测试级别，可配置为false,methods，tests，classes，instances -->
+<suite name="FddTestCenter" thread-count="1" parallel="tests">
+	<test name="FddTestCenter" enabled="true">
+		<packages>
+			<package name="com.fangdd.testcenter.testcase"></package>
+			<package name="com.fangdd.testcenter.testcase.service"></package>
+		</packages>
+	</test>
+</suite>

@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fangdd.testcenter.mapper.OutstandingIssueMapper">
+	<resultMap id="OutstandingIssueResultMap" type="OutstandingIssue">
+		<id property="outstandingIssueId" column="id" />
+		<result property="issueId" column="issue_id" />
+		<result property="resolveStatus" column="resolve_status" />
+		<result property="remark" column="remark" />
+		<result property="createTime" column="create_time" />
+		<result property="updateTime" column="update_time" />
+		<association property="user" javaType="User">
+			<id property="userId" column="userId" />
+			<result property="trueName" column="trueName" />
+		</association>
+		<association property="department" javaType="Department">
+			<id property="departmentId" column="departmentId" />
+			<result property="name" column="departmentName" />
+		</association>
+		<association property="team" javaType="Team">
+			<id property="teamId" column="teamId" />
+			<result property="name" column="teamName" />
+		</association>
+		<association property="project" javaType="ProjectInfo">
+			<id property="projectId" column="projectId" />
+			<result property="projectName" column="projectName" />
+		</association>
+	</resultMap>
+
+	<sql id="OutstandingIssueColumnSQL">
+		t_outstanding_issue.id,
+		t_outstanding_issue.issue_id,
+		t_outstanding_issue.resolve_status,
+		t_outstanding_issue.remark,
+		t_outstanding_issue.create_time,
+		t_outstanding_issue.update_time
+	</sql>
+
+	<sql id="UserColumnSQL">
+		t_user.id as userId,
+		t_user.true_name as trueName
+	</sql>
+
+	<sql id="DepartmentColumnSQL">
+		t_department.id as departmentId,
+		t_department.name as
+		departmentName
+	</sql>
+
+	<sql id="TeamColumnSQL">
+		t_team.id as teamId,
+		t_team.name as teamName
+	</sql>
+
+	<sql id="ProjectInfoColumnSQL">
+		t_project_info.id as projectId,
+		t_project_info.project_name
+		as projectName
+	</sql>
+
+	<sql id="joinSql">
+		from t_outstanding_issue
+		left join t_user
+		on
+		t_outstanding_issue.user_id = t_user.id
+		left join t_department
+		on
+		t_outstanding_issue.department_id = t_department.id
+		left join t_team
+		on
+		t_outstanding_issue.team_id = t_team.id
+		left join t_project_info
+		on
+		t_outstanding_issue.project_id = t_project_info.id
+	</sql>
+
+	<sql id="selectConditionSql">
+		<if
+			test="outstandingIssue.user != null and outstandingIssue.user.trueName !=''">
+			and t_user.true_name like
+			'%${outstandingIssue.user.trueName}%'
+		</if>
+		<if
+			test="outstandingIssue.department != null and outstandingIssue.department.departmentId > 0">
+			and
+			t_outstanding_issue.department_id =
+			#{outstandingIssue.department.departmentId}
+		</if>
+		<if
+			test="outstandingIssue.team != null and outstandingIssue.team.teamId > 0">
+			and
+			t_outstanding_issue.team_id=#{outstandingIssue.team.teamId}
+		</if>
+		<if
+			test="outstandingIssue.project != null and outstandingIssue.project.projectId > 0">
+			and
+			t_outstanding_issue.project_id=#{outstandingIssue.project.projectId}
+		</if>
+		<if
+			test="outstandingIssue.resolveStatus != null and outstandingIssue.resolveStatus>0">
+			and
+			t_outstanding_issue.resolve_status=#{outstandingIssue.resolveStatus}
+		</if>
+		<if
+			test="outstandingIssue.issueId != null and outstandingIssue.issueId>0">
+			and
+			t_outstanding_issue.issue_id=#{outstandingIssue.issueId}
+		</if>
+		<if
+			test="outstandingIssue.startTime != null and outstandingIssue.startTime !=''">
+			and
+			t_outstanding_issue.create_time &gt;=
+			#{outstandingIssue.startTime}
+		</if>
+		<if
+			test="outstandingIssue.endTime != null and outstandingIssue.endTime !=''">
+			and
+			t_outstanding_issue.create_time &lt;=
+			#{outstandingIssue.endTime}
+		</if>
+	</sql>
+
+	<insert id="addOutstandingIssue" useGeneratedKeys="true"
+		keyProperty="outstandingIssue.outstandingIssueId">
+		insert into t_outstanding_issue (
+		user_id,
+		department_id,
+		team_id,
+		project_id,
+		issue_id,
+		resolve_status,
+		remark,
+		create_time,
+		update_time
+		)
+		values (
+		#{outstandingIssue.user.userId},
+		#{outstandingIssue.department.departmentId},
+		#{outstandingIssue.team.teamId},
+		#{outstandingIssue.project.projectId},
+		#{outstandingIssue.issueId},
+		#{outstandingIssue.resolveStatus},
+		#{outstandingIssue.remark},
+		NOW(),
+		NOW()
+		)
+	</insert>
+
+	<update id="updateOutstandingIssue">
+		update t_outstanding_issue
+		set
+		t_outstanding_issue.team_id =
+		#{outstandingIssue.team.teamId},
+		t_outstanding_issue.project_id =
+		#{outstandingIssue.project.projectId},
+		t_outstanding_issue.issue_id =
+		#{outstandingIssue.issueId},
+		t_outstanding_issue.resolve_status =
+		#{outstandingIssue.resolveStatus},
+		t_outstanding_issue.remark =
+		#{outstandingIssue.remark},
+		t_outstanding_issue.update_time=NOW()
+		where
+		t_outstanding_issue.id=#{outstandingIssue.outstandingIssueId}
+	</update>
+
+	<delete id="deleteOutstandingIssue">
+		delete
+		from
+		t_outstanding_issue
+		where
+		t_outstanding_issue.id =
+		#{outstandingIssueId}
+	</delete>
+
+	<select id="getOutstandingIssueCount" resultType="int">
+		select count(1)
+		<include refid="joinSql" />
+		where 1 = 1
+		<include refid="selectConditionSql" />
+	</select>
+
+	<select id="getOutstandingIssueList" resultMap="OutstandingIssueResultMap">
+		select
+		<include refid="OutstandingIssueColumnSQL" />
+		,
+		<include refid="UserColumnSQL" />
+		,
+		<include refid="DepartmentColumnSQL" />
+		,
+		<include refid="TeamColumnSQL" />
+		,
+		<include refid="ProjectInfoColumnSQL" />
+		<include refid="joinSql" />
+		where
+		1 = 1
+		<include refid="selectConditionSql" />
+		order by t_outstanding_issue.create_time desc
+		limit
+		#{begin},#{size}
+	</select>
+
+	<select id="getOutstandingIssueById" resultMap="OutstandingIssueResultMap">
+		select
+		<include refid="OutstandingIssueColumnSQL" />
+		,
+		<include refid="UserColumnSQL" />
+		,
+		<include refid="DepartmentColumnSQL" />
+		,
+		<include refid="TeamColumnSQL" />
+		,
+		<include refid="ProjectInfoColumnSQL" />
+		<include refid="joinSql" />
+		where
+		t_outstanding_issue.id=#{outstandingIssueId}
+	</select>
+	
+	<select id="getOutstandingIssueCountByIssueId" resultType="int">
+		select count(1)
+		from t_outstanding_issue
+		where
+		t_outstanding_issue.issue_id=#{issueId}
+	</select>
+
+	<select id="getOutstandingIssueExportList" resultMap="OutstandingIssueResultMap">
+		select
+		<include refid="OutstandingIssueColumnSQL" />
+		,
+		<include refid="UserColumnSQL" />
+		,
+		<include refid="DepartmentColumnSQL" />
+		,
+		<include refid="TeamColumnSQL" />
+		,
+		<include refid="ProjectInfoColumnSQL" />
+		<include refid="joinSql" />
+		where
+		1 = 1
+		<include refid="selectConditionSql" />
+		order by t_outstanding_issue.department_id
+		desc,t_outstanding_issue.team_id
+		desc,t_outstanding_issue.project_id
+		desc,t_outstanding_issue.create_time desc
+	</select>
+</mapper> 

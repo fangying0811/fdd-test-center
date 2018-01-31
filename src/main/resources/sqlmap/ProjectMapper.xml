@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fangdd.testcenter.mapper.ProjectMapper">
+	<resultMap id="ProjectInfoResultMap" type="ProjectInfo">
+		<id property="projectId" column="id" />
+		<result property="projectName" column="project_name" />
+		<result property="developer" column="developer" />
+		<result property="tester" column="tester" />
+		<result property="status" column="status" />
+		<result property="createTime" column="create_time" />
+		<result property="updateTime" column="update_time" />
+		<result property="redmineProjectId" column="redmine_project_id" />
+		<association property="user" javaType="User">
+			<id property="userId" column="userId" />
+			<result property="trueName" column="trueName" />
+		</association>
+		<association property="department" javaType="Department">
+			<id property="departmentId" column="departmentId" />
+			<result property="name" column="departmentName" />
+		</association>
+		<association property="team" javaType="Team">
+			<id property="teamId" column="teamId" />
+			<result property="name" column="teamName" />
+		</association>
+	</resultMap>
+
+	<sql id="ProjectColumnSQL">
+		t_project_info.id,
+		t_project_info.project_name,
+		t_project_info.redmine_project_id,
+		t_project_info.developer,
+		t_project_info.tester,
+		t_project_info.status,
+		t_project_info.create_time,
+		t_project_info.update_time,
+		t_project_info.redmine_project_id
+	</sql>
+	<sql id="UserColumnSQL">
+		t_user.id as userId,
+		t_user.true_name as trueName
+	</sql>
+	<sql id="DepartmentColumnSQL">
+		t_department.id as departmentId,
+		t_department.name as
+		departmentName
+	</sql>
+	<sql id="TeamColumnSQL">
+		t_team.id as teamId,
+		t_team.name as
+		teamName
+	</sql>
+
+	<sql id="joinSql">
+		from t_project_info
+		left join t_user
+		on
+		t_project_info.user_id=t_user.id
+		left join t_department
+		on
+		t_project_info.department_id=t_department.id
+		left join t_team
+		on
+		t_project_info.team_id=t_team.id
+	</sql>
+	<sql id="selectConditionSql">
+		<if test="projectInfo.projectName != null and projectInfo.projectName !=''">
+			and t_project_info.project_name like
+			'%${projectInfo.projectName}%'
+		</if>
+		<if
+			test="projectInfo.department != null and projectInfo.department.departmentId >0">
+			and
+			t_project_info.department_id=#{projectInfo.department.departmentId}
+		</if>
+		<if test="projectInfo.team != null and projectInfo.team.teamId >0">
+			and
+			t_project_info.team_id=#{projectInfo.team.teamId}
+		</if>
+		<if test="projectInfo.status != null and projectInfo.status >0">
+			and
+			t_project_info.status=#{projectInfo.status}
+		</if>
+	</sql>
+
+	<insert id="addProject" useGeneratedKeys="true" keyProperty="projectInfo.projectId">
+		insert into t_project_info(
+		user_id,
+		department_Id,
+		team_id,
+		project_Name,
+		redmine_project_id,
+		developer,
+		tester,
+		status,
+		create_time,
+		update_time
+		)
+		values(
+		#{projectInfo.user.userId},
+		#{projectInfo.department.departmentId},
+		#{projectInfo.team.teamId},
+		#{projectInfo.projectName},
+		#{projectInfo.redmineProjectId},
+		#{projectInfo.developer},
+		#{projectInfo.tester},
+		#{projectInfo.status},
+		NOW(),
+		NOW()
+		)
+	</insert>
+
+	<update id="updateProject">
+		update t_project_info
+		set
+		t_project_info.project_Name=#{projectInfo.projectName},
+		t_project_info.department_id=#{projectInfo.department.departmentId},
+		t_project_info.team_id=#{projectInfo.team.teamId},
+		t_project_info.redmine_project_id=#{projectInfo.redmineProjectId},
+		t_project_info.developer=#{projectInfo.developer},
+		t_project_info.tester=#{projectInfo.tester},
+		t_project_info.status=#{projectInfo.status},
+		t_project_info.update_time=NOW()
+		where
+		t_project_info.id
+		=#{projectInfo.projectId}
+	</update>
+
+	<delete id="deleteProject">
+		delete from
+		t_project_info
+		where
+		t_project_info.id=#{projectId}
+	</delete>
+
+	<select id="getProjectCount" resultType="int">
+		select count(1)
+		<include refid="joinSql" />
+		where
+		1 = 1
+		<include refid="selectConditionSql" />
+	</select>
+
+	<select id="getProjectList" resultMap="ProjectInfoResultMap">
+		select
+		<include refid="ProjectColumnSQL" />
+		,
+		<include refid="UserColumnSQL" />
+		,
+		<include refid="DepartmentColumnSQL" />
+		,
+		<include refid="TeamColumnSQL" />
+		<include refid="joinSql" />
+		where
+		1 = 1
+		<include refid="selectConditionSql" />
+		order by t_project_info.create_time desc
+		limit
+		#{begin},#{size}
+	</select>
+
+	<select id="getProjectListByDepartmentId" resultMap="ProjectInfoResultMap">
+		select
+		<include refid="ProjectColumnSQL" />
+		,
+		<include refid="UserColumnSQL" />
+		,
+		<include refid="DepartmentColumnSQL" />
+		,
+		<include refid="TeamColumnSQL" />
+		<include refid="joinSql" />
+		where
+		t_project_info.department_id=#{departmentId}
+		and
+		t_project_info.status=1
+		order by
+		t_project_info.department_id desc,
+		t_project_info.team_id desc,
+		t_project_info.create_time desc
+	</select>
+
+	<select id="getProjectListByTeamId" resultMap="ProjectInfoResultMap">
+		select
+		<include refid="ProjectColumnSQL" />
+		,
+		<include refid="UserColumnSQL" />
+		,
+		<include refid="DepartmentColumnSQL" />
+		,
+		<include refid="TeamColumnSQL" />
+		<include refid="joinSql" />
+		where
+		t_project_info.team_id=#{teamId}
+		and
+		t_project_info.status=1
+		order by
+		t_project_info.department_id desc,
+		t_project_info.team_id desc,
+		t_project_info.create_time desc
+	</select>
+
+	<select id="getProjectCountByName" resultType="int">
+		select count(1)
+		<include refid="joinSql" />
+		where
+		t_project_info.project_name =#{name}
+	</select>
+
+	<select id="getProjectById" resultMap="ProjectInfoResultMap">
+		select
+		<include refid="ProjectColumnSQL" />
+		,
+		<include refid="UserColumnSQL" />
+		,
+		<include refid="DepartmentColumnSQL" />
+		,
+		<include refid="TeamColumnSQL" />
+		<include refid="joinSql" />
+		where
+		t_project_info.id=#{projectId}
+	</select>
+
+</mapper> 

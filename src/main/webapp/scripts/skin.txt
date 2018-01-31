@@ -1,0 +1,8 @@
+[
+	{id:'default',text:'默认'},
+	{id:'blue',text:'浅蓝'},
+	{id:'gray',text:'浅灰'},
+	{id:'olive2003',text:'浅绿'},
+	{id:'blue2003',text:'天空蓝'},
+	{id:'blue2010',text:'淡蓝'}
+]

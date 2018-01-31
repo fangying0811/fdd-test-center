@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fangdd.testcenter.mapper.TestStatisticMapper">
+	<resultMap id="TestStatisticMap" type="TestStatistic">
+		<id property="id" column="id" />
+		<result property="buildId" column="build_id" />
+		<result property="serviceId" column="service_id" />
+		<result property="className" column="class_name" />
+		<result property="caseName" column="case_name" />
+		<result property="caseDescription" column="case_description" />
+		<result property="caseMessage" column="case_message" />
+		<result property="caseLog" column="case_log" />
+		<result property="startTime" column="start_time" />
+		<result property="endTime" column="end_time" />
+		<result property="durationTime" column="duration_time" />
+		<result property="status" column="status" />
+		<result property="createTime" column="create_time" />
+		<result property="updateTime" column="update_time" />
+	</resultMap>
+
+	<sql id="TestStatisticColumnSQL">
+		t_test_statistic.id,
+		t_test_statistic.build_id,
+		t_test_statistic.service_id,
+		t_test_statistic.class_name,
+		t_test_statistic.case_name,
+		t_test_statistic.case_description,
+		t_test_statistic.case_message,
+		t_test_statistic.case_log,
+		t_test_statistic.start_time,
+		t_test_statistic.end_time,
+		t_test_statistic.duration_time,
+		t_test_statistic.status,
+		t_test_statistic.create_time,
+		t_test_statistic.update_time
+	</sql>
+
+	<sql id="joinSql">
+		from t_test_statistic
+	</sql>
+
+	<sql id="selectConditionSql">
+		<if test="testStatistic.className!=null and testStatistic.className!=''">
+			and
+			t_test_statistic.class_name like
+			'%${testStatistic.className}%'
+		</if>
+		<if test="testStatistic.caseName!=null and testStatistic.caseName!=''">
+			and
+			t_test_statistic.case_name like
+			'%${testStatistic.caseName}%'
+		</if>
+		<if test="testStatistic.status> 0">
+			and
+			t_test_statistic.status=#{testStatistic.status}
+		</if>
+		<if test="testStatistic.buildId> 0">
+			and
+			t_test_statistic.build_id=#{testStatistic.buildId}
+		</if>
+		<if test="testStatistic.startTime != null and testStatistic.startTime !=''">
+			and
+			t_test_statistic.start_time &gt;=
+			#{testStatistic.startTime}
+		</if>
+		<if test="testStatistic.endTime != null and testStatistic.endTime !=''">
+			and
+			t_test_statistic.end_time &lt;=
+			#{testStatistic.endTime}
+		</if>
+	</sql>
+
+	<sql id="updateTestStatisticBuildIdConditionSql">
+		<if test="testStatistic.serviceId> 0">
+			and
+			t_test_statistic.service_id=#{testStatistic.serviceId}
+		</if>
+		<if test="testStatistic.startTime != null and testStatistic.startTime !=''">
+			and
+			t_test_statistic.start_time &gt;=
+			#{testStatistic.startTime}
+		</if>
+		<if test="testStatistic.endTime != null and testStatistic.endTime !=''">
+			and
+			t_test_statistic.end_time &lt;=
+			#{testStatistic.endTime}
+		</if>
+	</sql>
+
+	<sql id="deleteConditionSql">
+		<if test="testStatistic.serviceId> 0">
+			and
+			t_test_statistic.service_id=#{testStatistic.serviceId}
+		</if>
+		<if test="testStatistic.className != null and testStatistic.className !=''">
+			and
+			t_test_statistic.class_name =
+			#{testStatistic.className}
+		</if>
+		<if test="testStatistic.caseName != null and testStatistic.caseName !=''">
+			and
+			t_test_statistic.case_name =
+			#{testStatistic.caseName}
+		</if>
+		<if test="testStatistic.startTime != null and testStatistic.startTime !=''">
+			and
+			t_test_statistic.start_time &gt;=
+			#{testStatistic.startTime}
+		</if>
+		<if test="testStatistic.endTime != null and testStatistic.endTime !=''">
+			and
+			t_test_statistic.end_time &lt;=
+			#{testStatistic.endTime}
+		</if>
+	</sql>
+
+	<insert id="addTestStatistic" useGeneratedKeys="true"
+		keyProperty="testStatistic.id">
+		insert into t_test_statistic (
+		service_id,
+		class_name,
+		case_name,
+		case_description,
+		case_message,
+		case_log,
+		start_time,
+		end_time,
+		duration_time,
+		status,
+		create_time,
+		update_time
+		) values (
+		#{testStatistic.serviceId},
+		#{testStatistic.className},
+		#{testStatistic.caseName},
+		#{testStatistic.caseDescription},
+		#{testStatistic.caseMessage},
+		#{testStatistic.caseLog},
+		#{testStatistic.startTime},
+		#{testStatistic.endTime},
+		#{testStatistic.durationTime},
+		#{testStatistic.status},
+		NOW(),
+		NOW()
+		)
+	</insert>
+
+	<update id="updateTestStatisticBuildId">
+		update t_test_statistic
+		set build_id=#{testStatistic.buildId}
+		where
+		1 = 1
+		<include refid="updateTestStatisticBuildIdConditionSql" />
+	</update>
+
+	<delete id="deleteTestStatistic">
+		delete from t_test_statistic
+		where
+		1 = 1
+		<include refid="deleteConditionSql" />
+	</delete>
+
+	<delete id="deleteInvalidTestStatistic">
+		delete from t_test_statistic
+		where build_id IS NULL
+	</delete>
+
+	<select id="getTestStatisticById" resultMap="TestStatisticMap">
+		select
+		<include refid="TestStatisticColumnSQL" />
+		<include refid="joinSql" />
+		where
+		t_test_statistic.id=#{id}
+	</select>
+
+	<select id="getTestStatisticList" resultMap="TestStatisticMap">
+		select
+		<include refid="TestStatisticColumnSQL" />
+		<include refid="joinSql" />
+		where
+		1 = 1
+		<include refid="selectConditionSql" />
+		order by
+		t_test_statistic.create_time desc
+		limit
+		#{begin},#{size}
+	</select>
+
+	<select id="getTestStatisticCount" resultType="int">
+		select count(1)
+		<include refid="joinSql" />
+		where
+		1 = 1
+		<include refid="selectConditionSql" />
+	</select>
+	
+	<delete id="deleteTestStatisticByBuildId">
+		delete from
+		t_test_statistic
+		where
+		t_test_statistic.build_id=#{buildId}
+	</delete>
+</mapper> 

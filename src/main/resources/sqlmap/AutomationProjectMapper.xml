@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fangdd.testcenter.mapper.AutomationProjectMapper">
+	<resultMap id="AutomationProjectMap" type="AutomationProject">
+		<id property="id" column="id" />
+		<result property="serviceName" column="service_name" />
+		<result property="remark" column="remark" />
+		<result property="pm" column="pm" />
+		<result property="departmentId" column="department_id" />
+		<result property="teamId" column="team_id" />
+		<result property="createTime" column="create_time" />
+		<result property="updateTime" column="update_time" />
+	</resultMap>
+
+	<sql id="AutomationProjectColumnSQL">
+		t_automation_project.id,
+		t_automation_project.service_name,
+		t_automation_project.remark,
+		t_automation_project.pm,
+		t_automation_project.department_id,
+		t_automation_project.team_id,
+		t_automation_project.create_time,
+		t_automation_project.update_time
+	</sql>
+
+	<sql id="joinSql">
+		from t_automation_project
+	</sql>
+
+	<sql id="selectConditionSql">
+		<if test="automationProject.departmentId> 0">
+			and
+			t_automation_project.department_id=#{automationProject.departmentId}
+		</if>
+		<if test="automationProject.teamId> 0">
+			and
+			t_automation_project.team_id=#{automationProject.teamId}
+		</if>
+		<if
+			test="automationProject.serviceName!=null and automationProject.serviceName!=''">
+			and
+			t_automation_project.service_name like
+			'%${automationProject.serviceName}%'
+		</if>
+	</sql>
+
+	<insert id="addAutomationProject" useGeneratedKeys="true"
+		keyProperty="automationProject.id">
+		insert into t_automation_project (
+		service_name,
+		remark,
+		pm,
+		department_id,
+		team_id,
+		create_time,
+		update_time
+		) values (
+		#{automationProject.serviceName},
+		#{automationProject.remark},
+		#{automationProject.pm},
+		#{automationProject.departmentId},
+		#{automationProject.teamId},
+		NOW(),
+		NOW()
+		)
+	</insert>
+
+	<update id="updateAutomationProject">
+		update t_automation_project
+		set
+		t_automation_project.service_name=#{automationProject.serviceName},
+		t_automation_project.remark=#{automationProject.remark},
+		t_automation_project.pm=#{automationProject.pm},
+		t_automation_project.department_id=#{automationProject.departmentId},
+		t_automation_project.team_id=#{automationProject.teamId},
+		t_automation_project.update_time=NOW()
+		where
+		t_automation_project.id=#{automationProject.id}
+	</update>
+
+	<delete id="deleteAutomationProject">
+		delete from
+		t_automation_project
+		where
+		t_automation_project.id=#{id}
+	</delete>
+
+	<select id="getAutomationProjectById" resultMap="AutomationProjectMap">
+		select
+		<include refid="AutomationProjectColumnSQL" />
+		<include refid="joinSql" />
+		where
+		t_automation_project.id=#{id}
+	</select>
+
+	<select id="getAutomationProjectList" resultMap="AutomationProjectMap">
+		select
+		<include refid="AutomationProjectColumnSQL" />
+		<include refid="joinSql" />
+		where
+		1 = 1
+		<include refid="selectConditionSql" />
+		order by
+		t_automation_project.create_time desc
+		limit
+		#{begin},#{size}
+	</select>
+
+	<select id="getAutomationProjectCount" resultType="int">
+		select count(1)
+		<include refid="joinSql" />
+		where
+		1 = 1
+		<include refid="selectConditionSql" />
+	</select>
+
+	<select id="getAutomationProjectListByDepartmentId" resultMap="AutomationProjectMap">
+		select
+		<include refid="AutomationProjectColumnSQL" />
+		<include refid="joinSql" />
+		where
+		t_automation_project.department_id=#{departmentId}
+		order by
+		t_automation_project.department_id desc,
+		t_automation_project.team_id desc,
+		t_automation_project.create_time desc
+	</select>
+
+	<select id="getAutomationProjectListByTeamId" resultMap="AutomationProjectMap">
+		select
+		<include refid="AutomationProjectColumnSQL" />
+		<include refid="joinSql" />
+		where
+		t_automation_project.team_id=#{teamId}
+		order by
+		t_automation_project.department_id desc,
+		t_automation_project.team_id desc,
+		t_automation_project.create_time desc
+	</select>
+</mapper> 

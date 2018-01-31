@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fangdd.testcenter.mapper.MenuMapper">
+	<resultMap id="MenuResultMap" type="Menu">
+		<id property="menuId" column="id" />
+		<result property="name" column="name" />
+		<result property="url" column="url" />
+		<result property="priority" column="priority" />
+		<result property="parentId" column="parent_id" />
+		<result property="status" column="status" />
+	</resultMap>
+	<sql id="MenuColumnSQL">
+		t_menu.id,
+		t_menu.name,
+		t_menu.url,
+		t_menu.priority,
+		t_menu.parent_id,
+		t_menu.status
+	</sql>
+	<select id="getParentMenuList" resultMap="MenuResultMap">
+		select
+		<include refid="MenuColumnSQL" />
+		from t_menu
+		where
+		t_menu.parent_id=0
+		and t_menu.status=0
+		order by
+		t_menu.priority
+	</select>
+	<select id="getMenuListByParentId" resultMap="MenuResultMap">
+		select
+		<include refid="MenuColumnSQL" />
+		from
+		t_menu
+		where
+		t_menu.parent_id=#{parentId}
+		and t_menu.status=0
+		order by
+		t_menu.priority
+	</select>
+	<select id="getSubMenuCountByParentId" resultType="int">
+		select
+		count(1)
+		from t_menu
+		where
+		t_menu.parent_id=#{parentId}
+	</select>
+	<select id="getMenuCount" resultType="int">
+		select count(1) from
+		t_menu
+		where
+		1 = 1
+		<if test="menu.name != null and menu.name !=''">
+			and t_menu.name like '%${menu.name}%'
+		</if>
+	</select>
+	<select id="getMenuListByPage" resultMap="MenuResultMap">
+		select
+		<include refid="MenuColumnSQL" />
+		from t_menu
+		where
+		1 = 1
+		<if test="menu.name != null and menu.name !=''">
+			and t_menu.name like '%${menu.name}%'
+		</if>
+		order by t_menu.parent_id,t_menu.priority
+		limit
+		#{begin},#{size}
+	</select>
+	<select id="getMenuById" resultMap="MenuResultMap">
+		select
+		<include refid="MenuColumnSQL" />
+		from t_menu
+		where
+		t_menu.id=#{menuId}
+	</select>
+	<select id="getMenuByName" resultMap="MenuResultMap">
+		select
+		<include refid="MenuColumnSQL" />
+		from t_menu
+		where
+		t_menu.name=#{name}
+	</select>
+	<insert id="addMenu" useGeneratedKeys="true" keyProperty="menu.menuId">
+		insert
+		into t_menu(
+		name,
+		url,
+		priority,
+		parent_id,
+		status
+		)
+		values(
+		#{menu.name},
+		#{menu.url},
+		#{menu.priority},
+		#{menu.parentId},
+		#{menu.status}
+		)
+	</insert>
+	<update id="updateMenu">
+		update t_menu
+		set
+		t_menu.name =#{menu.name},
+		t_menu.url
+		= #{menu.url} ,
+		t_menu.priority=#{menu.priority},
+		t_menu.status=#{menu.status}
+		where t_menu.id =
+		#{menu.menuId}
+	</update>
+	<delete id="deleteMenu">
+		delete from t_menu
+		where
+		t_menu.id=#{menuId}
+	</delete>
+	<select id="getSelectMenuList" resultMap="MenuResultMap">
+		select
+		<include refid="MenuColumnSQL" />
+		from t_menu
+		where t_menu.status=0
+		order by t_menu.priority
+	</select>
+	<select id="getAllMenuList" resultMap="MenuResultMap">
+		select
+		<include refid="MenuColumnSQL" />
+		from t_menu
+		order by t_menu.priority
+	</select>
+</mapper> 

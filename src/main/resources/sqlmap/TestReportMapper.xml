@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fangdd.testcenter.mapper.TestReportMapper">
+	<resultMap id="TestReportMap" type="com.fangdd.testcenter.bean.TestReport">
+		<id property="testReportId" column="id" />
+		<result property="resource" column="resource" />
+		<result property="trueStartTime" column="true_start_time" />
+		<result property="trueEndTime" column="true_end_time" />
+		<result property="summary" column="summary" />
+		<result property="versionDetail" column="version_detail" />
+		<result property="createTime" column="create_time" />
+		<result property="updateTime" column="update_time" />
+		<result property="issues" column="issues" />
+		<result property="onlineVerification" column="onlineVerification" />
+		<result property="testResult" column="test_result" />
+		<result property="versionInfo" column="version_info" />
+		<result property="cases" column="cases" />
+		<result property="bugs" column="bugs" />
+		<result property="bugCritical" column="bug_critical" />
+		<!-- 
+		<result property="devTag" column="dev_tag" />
+		<result property="releaseTag" column="release_tag" />
+		 -->
+		<result property="bugsLink" column="bugs_link" />
+		<result property="requirementLink" column="requirement_link" />
+		<association property="user" javaType="User">
+			<id property="userId" column="userId" />
+			<result property="trueName" column="trueName" />
+		</association>
+		<association property="department" javaType="Department">
+			<id property="departmentId" column="departmentId" />
+			<result property="name" column="departmentName" />
+		</association>
+		<association property="team" javaType="Team">
+			<id property="teamId" column="teamId" />
+			<result property="name" column="teamName" />
+		</association>
+		<association property="project" javaType="ProjectInfo">
+			<id property="projectId" column="projectId" />
+			<result property="projectName" column="projectName" />
+		</association>
+	</resultMap>
+
+	<sql id="TestReportColumnSQL">
+		t_test_report.id,
+		t_test_report.resource,
+		t_test_report.true_start_time,
+		t_test_report.true_end_time,
+		t_test_report.create_time,
+		t_test_report.update_time,
+		t_test_report.summary,
+		t_test_report.version_detail,
+		t_test_report.issues,
+		t_test_report.test_result,
+		t_test_report.version_info,
+		t_test_report.onlineVerification,
+		t_test_report.cases,
+		t_test_report.bugs,
+		t_test_report.bug_critical,
+		t_test_report.bugs_link,
+		t_test_report.requirement_link
+	</sql>
+
+	<sql id="UserColumnSQL">
+		t_user.id as userId,
+		t_user.true_name as trueName
+	</sql>
+
+	<sql id="DepartmentColumnSQL">
+		t_department.id as departmentId,
+		t_department.name as
+		departmentName
+	</sql>
+
+	<sql id="TeamColumnSQL">
+		t_team.id as teamId,
+		t_team.name as teamName
+	</sql>
+
+	<sql id="ProjectInfoColumnSQL">
+		t_project_info.id as projectId,
+		t_project_info.project_name
+		as projectName
+	</sql>
+
+	<sql id="joinSQL">
+		from t_test_report
+		left join t_user
+		on
+		t_test_report.user_id = t_user.id
+		left join t_department
+		on
+		t_test_report.department_id = t_department.id
+		left join t_team
+		on
+		t_test_report.team_id = t_team.id
+		left join t_project_info
+		on
+		t_test_report.project_id = t_project_info.id
+	</sql>
+
+	<sql id="selectConditionSQL">
+		<if test="testReport.resource != null">
+			and t_test_report.resource like '%${testReport.resource}%'
+		</if>
+		<if
+			test="testReport.department != null and testReport.department.departmentId > 0">
+			and t_test_report.department_id = #{testReport.department.departmentId}
+		</if>
+		<if test="testReport.team != null and testReport.team.teamId > 0">
+			and t_test_report.team_id = #{testReport.team.teamId}
+		</if>
+		<if test="testReport.project != null and testReport.project.projectId > 0">
+			and t_test_report.project_id = #{testReport.project.projectId}
+		</if>
+		<if test="testReport.startTime != null and testReport.startTime !=''">
+			and t_test_report.create_time &gt;=
+			#{testReport.startTime}
+		</if>
+		<if test="testReport.endTime != null and testReport.endTime !=''">
+			and t_test_report.create_time &lt;= #{testReport.endTime}
+		</if>
+		<if
+			test="testReport.trueStartTime != null and testReport.trueStartTime !=''">
+			and t_test_report.true_start_time &gt;=
+			#{testReport.trueStartTime}
+		</if>
+		<if test="testReport.trueEndTime != null and testReport.trueEndTime !=''">
+			and t_test_report.true_start_time &lt;=
+			#{testReport.trueEndTime}
+		</if>
+	</sql>
+
+	<insert id="addTestReport" useGeneratedKeys="true"
+		keyProperty="testReport.testReportId">
+		insert into t_test_report (
+		resource,
+		user_id,
+		department_id,
+		team_id,
+		project_id,
+		true_start_time,
+		true_end_time,
+		summary,
+		version_detail,
+		issues,
+		onlineVerification,
+		test_result,
+		version_info,
+		cases,
+		bugs,
+		bug_critical,
+		bugs_link,
+		requirement_link,
+		create_time,
+		update_time
+		) values (
+		#{testReport.resource},
+		#{testReport.user.userId},
+		#{testReport.department.departmentId},
+		#{testReport.team.teamId},
+		#{testReport.project.projectId},
+		#{testReport.trueStartTime},
+		#{testReport.trueEndTime},
+		#{testReport.summary},
+		#{testReport.versionDetail},
+		#{testReport.issues},
+		#{testReport.onlineVerification},
+		#{testReport.testResult},
+		#{testReport.versionInfo},
+		#{testReport.cases},
+		#{testReport.bugs},
+		#{testReport.bugCritical},
+		#{testReport.bugsLink},
+		#{testReport.requirementLink},
+		NOW(),
+		NOW()
+		)
+	</insert>
+
+	<update id="updateTestReport">
+		update t_test_report
+		set
+		t_test_report.team_id = #{testReport.team.teamId},
+		t_test_report.project_id = #{testReport.project.projectId},
+		t_test_report.true_start_time = #{testReport.trueStartTime},
+		t_test_report.true_end_time = #{testReport.trueEndTime},
+		t_test_report.summary = #{testReport.summary},
+		t_test_report.version_detail = #{testReport.versionDetail},
+		t_test_report.issues = #{testReport.issues},
+		t_test_report.onlineVerification = #{testReport.onlineVerification},
+		t_test_report.test_result = #{testReport.testResult},
+		t_test_report.version_info = #{testReport.versionInfo},
+		t_test_report.resource = #{testReport.resource},
+		t_test_report.cases = #{testReport.cases},
+		t_test_report.bugs = #{testReport.bugs},
+		t_test_report.bug_critical = #{testReport.bugCritical},
+		t_test_report.bugs_link = #{testReport.bugsLink},
+		t_test_report.requirement_link = #{testReport.requirementLink},
+		t_test_report.update_time = NOW()
+		where
+		t_test_report.id = #{testReport.testReportId}
+	</update>
+
+	<delete id="deleteTestReport">
+		delete from t_test_report
+		where
+		t_test_report.id = #{testReportId}
+	</delete>
+
+	<select id="getTestReportCount" resultType="int">
+		select count(1)
+		<include refid="joinSQL" />
+		where 1 = 1
+		<include refid="selectConditionSQL" />
+	</select>
+
+	<select id="getTestReportList" resultMap="TestReportMap">
+		select
+		<include refid="TestReportColumnSQL" />
+		,
+		<include refid="UserColumnSQL" />
+		,
+		<include refid="DepartmentColumnSQL" />
+		,
+		<include refid="TeamColumnSQL" />
+		,
+		<include refid="ProjectInfoColumnSQL" />
+		<include refid="joinSQL" />
+		where
+		1 = 1
+		<include refid="selectConditionSQL" />
+		order by t_test_report.create_time desc
+		limit
+		#{begin},#{size}
+	</select>
+
+	<select id="getTestReportById" resultMap="TestReportMap">
+		select
+		<include refid="TestReportColumnSQL" />
+		,
+		<include refid="UserColumnSQL" />
+		,
+		<include refid="DepartmentColumnSQL" />
+		,
+		<include refid="TeamColumnSQL" />
+		,
+		<include refid="ProjectInfoColumnSQL" />
+		<include refid="joinSQL" />
+		where
+		t_test_report.id = #{testReportId}
+	</select>
+</mapper>
