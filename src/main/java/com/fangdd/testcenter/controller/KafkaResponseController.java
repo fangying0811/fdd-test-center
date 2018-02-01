@@ -56,50 +56,16 @@ public class KafkaResponseController extends AbstractController {
 		if(strRequestJson!=null&&!strRequestJson.equals("")){
 			HttpResponse res = HttpToolKit.invokePost("http://172.28.3.68:9096/mljr-data-center/test/kafka", params);
 			// 此Json未保存到对应的Topic中，将请求的消息体保存至数据库表中
-			new Request(new RequestContent() {
-				void doSave() {
-					int kafkaResponseCount = kafkaResponseService.getKafkaResponseCountByJson(kafkaResponse);
-					if (kafkaResponseCount == 0) {
-						kafkaResponseService.addKafkaResponse(kafkaResponse);
-					}
+			if(res.getContent().contains("success")){
+				int kafkaResponseCount = kafkaResponseService.getKafkaResponseCountByJson(kafkaResponse);
+				if (kafkaResponseCount == 0) {
+					kafkaResponseService.addKafkaResponse(kafkaResponse);
 				}
-			}).start();
+			}
 			return res.getContent();
 		}else {
 			return "";
 		}
 	}
 	
-	public class Request {
-		private RequestContent rc;// 请求主体
-
-		public Request(RequestContent rc) {
-			this.rc = rc;
-		}
-
-		protected void start() { // 开始请求
-			final Thread t = new Thread(new Runnable() {
-				public void run() {
-					try {
-						rc.doSave();// 响应请求
-					} catch (Exception e) {
-						e.printStackTrace();
-						rc.onFailure(); // 如果执行失败
-					}
-					rc.onSuccess();// 如果执行成功
-				}
-			});
-			t.start();
-		}
-	}
-
-	abstract class RequestContent {
-		void onSuccess() { // 执行成功的动作。用户可以覆盖此方法
-		}
-
-		void onFailure() { // 执行失败的动作。用户可以覆盖此方法
-		}
-
-		abstract void doSave(); // 用户必须实现这个抽象方法，告诉子线程要做什么
-	}
 }
