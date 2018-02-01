@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fangdd.testcenter.mapper.KafkaInfoMapper">
+	<resultMap id="KafkaInfoResultMap" type="KafkaInfo">
+		<id property="kafkaInfoId" column="id" />
+		<result property="kafkaTopic" column="kafka_topic" />
+		<result property="createTime" column="create_time" />
+		<association property="department" javaType="Department">
+			<id property="departmentId" column="departmentId" />
+			<result property="name" column="departmentName" />
+		</association>
+		<association property="team" javaType="Team">
+			<id property="teamId" column="teamId" />
+			<result property="name" column="teamName" />
+		</association>
+		<association property="project" javaType="ProjectInfo">
+			<id property="projectId" column="projectId" />
+			<result property="projectName" column="project_name" />
+		</association>
+	</resultMap>
+	
+	<sql id="KafkaInfoColumnSQL">
+		t_kafka_manage.id,
+		t_kafka_manage.department_id,
+		t_kafka_manage.team_id,
+		t_kafka_manage.project_id,
+		t_kafka_manage.kafka_topic,
+		t_kafka_manage.create_time
+	</sql>
+	<sql id="DepartmentColumnSQL">
+		t_department.id as departmentId,
+		t_department.name as
+		departmentName
+	</sql>
+	<sql id="TeamColumnSQL">
+		t_team.id as teamId,
+		t_team.name as
+		teamName
+	</sql>
+	<sql id="ProjectColumnSQL">
+		t_project_info.id as projectId,
+		t_project_info.project_name as
+		project_name
+	</sql>
+	
+	<sql id="joinSql">
+		from t_kafka_manage
+		left join t_department
+		on
+		t_kafka_manage.department_id=t_department.id
+		left join t_team
+		on
+		t_kafka_manage.team_id=t_team.id
+		left join t_project_info
+		on t_kafka_manage.project_id=t_project_info.id
+	</sql>
+	<sql id="selectConditionSql">
+		<if test="kafkaInfo.kafkaTopic != null and kafkaInfo.kafkaTopic !=''">
+			and t_kafka_manage.kafka_topic like
+			'%${kafkaInfo.kafkaTopic}%'
+		</if>
+		<if
+			test="kafkaInfo.team != null and kafkaInfo.team.teamId >0">
+			and
+			t_kafka_manage.team_id=#{kafkaInfo.team.teamId}
+		</if>
+		<if
+			test="kafkaInfo.project != null and kafkaInfo.project.projectId >0">
+			and
+			t_kafka_manage.project_id=#{kafkaInfo.project.projectId}
+		</if>
+	</sql>
+	
+	<select id="getKafkaInfoList" resultMap="KafkaInfoResultMap">
+		select
+		<include refid="KafkaInfoColumnSQL" />
+		,
+		<include refid="DepartmentColumnSQL" />
+		,
+		<include refid="TeamColumnSQL" />
+		,
+		<include refid="ProjectColumnSQL" />
+		<include refid="joinSql" />
+		where
+		1 = 1
+		<include refid="selectConditionSql" />
+		order by t_kafka_manage.create_time desc
+		limit
+		#{begin},#{size}
+	</select>
+	
+	<select id="getKafkaInfoCount" resultType="int">
+		select count(1)
+		<include refid="joinSql" />
+		where
+		1 = 1
+		<include refid="selectConditionSql" />
+	</select>
+	
+	<insert id="addKafkaInfo"  useGeneratedKeys="true" keyProperty="kafkaInfo.kafkaInfoId"> 
+		insert into t_kafka_manage(
+		team_id,
+		project_id,
+		kafka_topic,
+		create_time
+		)
+		values(
+		#{kafkaInfo.team.teamId},
+		#{kafkaInfo.project.projectId},
+		#{kafkaInfo.kafkaTopic},
+		NOW()
+		)
+	</insert>
+	
+	<update id="updateKafkaInfo">
+		update t_kafka_manage
+		set
+		t_kafka_manage.team_id=#{kafkaInfo.team.teamId},
+		t_kafka_manage.project_id=#{kafkaInfo.project.projectId},
+		t_kafka_manage.kafka_topic=#{kafkaInfo.kafkaTopic}
+		where
+		t_kafka_manage.id
+		=#{kafkaInfo.kafkaInfoId}
+	</update>
+	
+	<delete id="deleteKafkaInfo">
+		delete from
+		t_kafka_manage
+		where
+		t_kafka_manage.id=#{kafkaId}
+	</delete>
+	
+	<select id="getKafkaById" resultMap="KafkaInfoResultMap">
+		select
+		<include refid="KafkaInfoColumnSQL" />
+		,
+		<include refid="DepartmentColumnSQL" />
+		,
+		<include refid="TeamColumnSQL" />
+		,
+		<include refid="ProjectColumnSQL" />
+		<include refid="joinSql" />
+		where
+		t_kafka_manage.id=#{kafkaId}
+	</select>
+	
+	<select id="getKafkaByProjectId" resultMap="KafkaInfoResultMap">
+		select
+		<include refid="KafkaInfoColumnSQL" />
+		from t_kafka_manage
+		where
+		t_kafka_manage.project_id=#{projectId}
+	</select>
+	
+	
+</mapper>

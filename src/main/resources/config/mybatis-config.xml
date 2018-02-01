@@ -23,5 +23,7 @@
 		<typeAlias alias="TestSuiteStatistic"
 			type="com.fangdd.testcenter.bean.TestSuiteStatistic" />
 		<typeAlias alias="TestStatistic" type="com.fangdd.testcenter.bean.TestStatistic" />
+		<typeAlias alias="KafkaInfo" type="com.fangdd.testcenter.bean.KafkaInfo" />
+		<typeAlias alias="KafkaResponse" type="com.fangdd.testcenter.bean.KafkaResponse" />
 	</typeAliases>
 </configuration>

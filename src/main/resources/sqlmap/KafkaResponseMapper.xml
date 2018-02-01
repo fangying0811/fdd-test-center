@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fangdd.testcenter.mapper.KafkaResponseMapper">
+	<resultMap id="KafkaResponseResultMap" type="KafkaResponse">
+		<id property="kafkaResponseId" column="id" />
+		<result property="requestJson" column="request_json" />
+		<association property="kafkaInfo" javaType="KafkaInfo">
+			<id property="kafkaInfoId" column="kafkaInfoId" />
+			<result property="kafkaTopic" column="kafkaTopic" />
+		</association>
+	</resultMap>
+	
+	<insert id="addKafkaResponse"  useGeneratedKeys="true" keyProperty="kafkaResponse.kafkaResponseId"> 
+		insert into t_kafka_response(
+		kafka_id,
+		request_json,
+		create_time
+		)
+		values(
+		#{kafkaResponse.kafkaInfo.kafkaInfoId},
+		#{kafkaResponse.requestJson},
+		NOW()
+		)
+	</insert>
+	
+	<sql id="KafkaResponseColumnSQL">
+		t_kafka_response.id,
+		t_kafka_response.kafka_id,
+		t_kafka_response.request_json,
+		t_kafka_response.create_time
+	</sql>
+	
+	<sql id="KafkaInfoColumnSQL">
+		t_kafka_manage.id as kafkaInfoId,
+		t_kafka_manage.kafka_topic as kafkaTopic
+	</sql>
+	
+	<sql id="joinSql">
+		from t_kafka_response
+		left join t_kafka_manage
+		on
+		t_kafka_response.kafka_id=t_kafka_manage.id
+	</sql>
+	<select id="getKafkaResponseInfoList" resultMap="KafkaResponseResultMap">
+		select
+		<include refid="KafkaResponseColumnSQL" />
+		,
+		<include refid="KafkaInfoColumnSQL" />
+		<include refid="joinSql" />
+		where
+		1 = 1
+		<include refid="selectConditionSql" />
+		order by t_kafka_response.create_time desc
+		limit
+		#{begin},#{size}
+	</select>
+	
+	<sql id="selectConditionSql">
+		<if test="kafkaResponse.kafkaInfo != null and kafkaResponse.kafkaInfo.kafkaInfoId>0">
+			and t_kafka_response.kafka_id =#{kafkaResponse.kafkaInfo.kafkaInfoId}
+		</if>
+	</sql>
+	
+	<select id="getKafkaResponseCount" resultType="int">
+		select count(1)
+		<include refid="joinSql" />
+		where
+		1 = 1
+		<include refid="selectConditionSql" />
+	</select>
+	
+	<select id="getKafkaResponseByJson" resultType="int">
+		select count(1) from t_kafka_response
+		where
+		1 = 1 and t_kafka_response.kafka_id=#{kafkaResponse.kafkaInfo.kafkaInfoId}
+		and t_kafka_response.request_json =#{kafkaResponse.requestJson}
+	</select>
+	
+</mapper>
