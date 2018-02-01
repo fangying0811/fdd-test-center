@@ -382,3 +382,25 @@ CREATE TABLE `t_work_plan` (
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+DROP TABLE IF EXISTS `t_kafka_manage`;
+CREATE TABLE `t_kafka_manage` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `department_id` bigint(20) DEFAULT NULL,
+  `team_id` bigint(20) DEFAULT NULL,
+  `project_id` bigint(20) DEFAULT NULL,
+  `kafka_topic` varchar(200) DEFAULT NULL,
+  `create_time` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `t_kafka_response`;
+CREATE TABLE `t_kafka_response` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `kafka_id` bigint(20) DEFAULT NULL,
+  `request_json` varchar(1000) DEFAULT NULL,
+  `response` varchar(20) DEFAULT NULL,
+  `create_time` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8;
+
