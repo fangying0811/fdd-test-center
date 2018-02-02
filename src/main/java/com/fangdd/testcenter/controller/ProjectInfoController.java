@@ -70,6 +70,18 @@ public class ProjectInfoController extends AbstractController {
 		}
 		return HttpResult.successWithData(projectInfos);
 	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/projectInfoListByTeamAndKafka.json")
+	public HttpResult projectInfoListByTeamAndKafka(@RequestParam(defaultValue = "0") long teamId) {
+		List<ProjectInfo> projectInfos=null;
+		if (teamId > 0) {
+			projectInfos=projectService.getProjectListByTeamIdAndKafka(teamId);
+		}
+		return HttpResult.successWithData(projectInfos);
+	}
+
+
 
 	@SessionCheck
 	@ResponseBody
@@ -84,7 +96,7 @@ public class ProjectInfoController extends AbstractController {
 		}
 		return HttpResult.successWithData(projectInfos);
 	}
-
+	
 	@SessionCheck
 	@ResponseBody
 	@RequestMapping(value = "/existProject.json")
@@ -106,7 +118,6 @@ public class ProjectInfoController extends AbstractController {
 		statusList.add(WebUtil.getMap(new String[] { "status", "statusText" }, new Object[] { 2, "禁用" }));
 		return HttpResult.successWithData(statusList);
 	}
-
 	
 	@SessionCheck
 	@ResponseBody

@@ -25,4 +25,6 @@ public interface ProjectService {
 	public int getProjectCountByName(String name);
 
 	public ProjectInfo getProjectById(long projectId);
+	
+	public List<ProjectInfo> getProjectListByTeamIdAndKafka(long teamId);
 }

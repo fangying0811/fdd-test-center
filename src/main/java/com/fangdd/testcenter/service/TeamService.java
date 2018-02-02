@@ -28,4 +28,6 @@ public interface TeamService {
 	public List<Team> getTeamListAll();
 
 	public int getTeamCountByDepartmentId(long departmentId);
+	
+	public List<Team> getTeamListFromKafkaManage();
 }

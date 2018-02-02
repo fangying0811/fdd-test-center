@@ -156,4 +156,11 @@ public class TeamServiceImpl implements TeamService {
 		}
 		return count;
 	}
+
+	@Override
+	public List<Team> getTeamListFromKafkaManage() {
+		// TODO Auto-generated method stub
+		List<Team> list=teamMapper.getTeamListFromKafkaManage();
+		return list;
+	}
 }

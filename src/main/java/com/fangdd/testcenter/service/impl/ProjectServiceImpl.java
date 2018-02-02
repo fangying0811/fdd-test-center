@@ -154,4 +154,11 @@ public class ProjectServiceImpl implements ProjectService {
 			throw new BusinessException(SystemErrorCodeConstant.QUERY_FAILURE, e);
 		}
 	}
+
+	@Override
+	public List<ProjectInfo> getProjectListByTeamIdAndKafka(long teamId) {
+		// TODO Auto-generated method stub
+		List<ProjectInfo> list= projectMapper.getProjectListByTeamIdAndKafka(teamId);
+		return list;
+	}
 }

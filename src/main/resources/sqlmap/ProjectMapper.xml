@@ -219,5 +219,13 @@
 		where
 		t_project_info.id=#{projectId}
 	</select>
+	
+	<select id="getProjectListByTeamIdAndKafka" resultMap="ProjectInfoResultMap">
+		SELECT DISTINCT t_kafka_manage.team_id,project_id As id,t_project_info.`project_name`  
+		FROM t_kafka_manage
+		LEFT JOIN t_project_info
+		ON t_kafka_manage.`project_id`=t_project_info.`id`
+		WHERE t_kafka_manage.`team_id`=#{teamId1}
+	</select>
 
 </mapper> 

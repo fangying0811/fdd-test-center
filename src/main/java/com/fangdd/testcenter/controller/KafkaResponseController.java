@@ -56,12 +56,9 @@ public class KafkaResponseController extends AbstractController {
 		if(strRequestJson!=null&&!strRequestJson.equals("")){
 			HttpResponse res = HttpToolKit.invokePost("http://172.28.3.68:9096/mljr-data-center/test/kafka", params);
 			// 此Json未保存到对应的Topic中，将请求的消息体保存至数据库表中
-			if(res.getContent().contains("success")){
-				int kafkaResponseCount = kafkaResponseService.getKafkaResponseCountByJson(kafkaResponse);
-				if (kafkaResponseCount == 0) {
-					kafkaResponseService.addKafkaResponse(kafkaResponse);
-				}
-			}
+			
+			kafkaResponseService.addKafkaResponse(kafkaResponse);
+			
 			return res.getContent();
 		}else {
 			return "";

@@ -154,4 +154,11 @@
 		where
 		t_team.department_id=#{departmentId}
 	</select>
+	
+	<select id="getTeamListFromKafkaManage" resultMap="TeamResultMap">
+		SELECT DISTINCT team_id AS id,t_team.`name` 
+		FROM t_kafka_manage
+		INNER JOIN  t_team
+		ON t_kafka_manage.`team_id`=t_team.`id`
+	</select>
 </mapper> 

@@ -57,6 +57,12 @@ public class TeamController extends AbstractController {
 					.successWithData(teamService.getTeamListByDepartmentId(user.getDepartment().getDepartmentId()));
 		}
 	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/teamListFromKafkaManage.json")
+	public HttpResult teamListFromKafkaManage() {
+		return HttpResult.successWithData(teamService.getTeamListFromKafkaManage());
+	}
 
 	@SessionCheck
 	@ResponseBody

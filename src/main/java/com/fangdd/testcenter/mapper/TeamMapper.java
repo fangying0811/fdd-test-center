@@ -27,4 +27,6 @@ public interface TeamMapper {
 	public Team getTeamById(@Param("teamId") long teamId);
 
 	public int getTeamCountByDepartmentId(@Param("departmentId") long departmentId);
+	
+	public List<Team> getTeamListFromKafkaManage();
 }

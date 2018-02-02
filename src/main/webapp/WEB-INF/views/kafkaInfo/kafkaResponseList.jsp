@@ -18,14 +18,14 @@
 			 	<td style="text-align:left;"><label for="team">小组：</label>
 				<input id="teamId" name="kafkaInfo.team.teamId"
 					class="mini-combobox"
-					url="<%=basePath%>team/teamListByDepartmentId.json"
+					url="<%=basePath%>team/teamListFromKafkaManage.json"
 					dataField="data" valueField="teamId" textField="name" allowInput="true"
 					onvaluechanged="onTeamChanged"
 					emptyText="请选择小组" style="width: 120px;"/></td>
 				<td style="text-align:left;"><label for="team">项目：</label>
 				<input id="projectId" name="kafkaInfo.project.projectId"
 					class="mini-combobox"
-					url="<%=basePath%>projectInfo/projectInfoListByTeamId.json"
+					url="<%=basePath%>projectInfo/projectInfoListByTeamAndKafka.json"
 					dataField="data" valueField="projectId" textField="projectName" allowInput="true"
 					onvaluechanged="onProjectChanged"
 					emptyText="请选择项目" style="width: 140px;"/></td>
@@ -84,7 +84,7 @@
 		function onTeamChanged(e) {
             var teamId=team.getValue();
             project.setValue();
-            var url="<%=basePath%>projectInfo/projectInfoListByTeamId.json?teamId="+teamId;
+            var url="<%=basePath%>projectInfo/projectInfoListByTeamAndKafka.json?teamId="+teamId;
             project.setUrl(url);
 		}
 		

@@ -26,4 +26,6 @@ public interface ProjectMapper {
 	public int getProjectCountByName(@Param("name") String name);
 
 	public ProjectInfo getProjectById(@Param("projectId") long projectId);
+	
+	public List<ProjectInfo> getProjectListByTeamIdAndKafka(@Param("teamId1") long teamId);
 }
