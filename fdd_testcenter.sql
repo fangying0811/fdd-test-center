@@ -399,6 +399,7 @@ CREATE TABLE `t_kafka_response` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `kafka_id` bigint(20) DEFAULT NULL,
   `request_json` varchar(1000) DEFAULT NULL,
+  `describes` varchar(200) DEFAULT NULL,
   `response` varchar(20) DEFAULT NULL,
   `create_time` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
