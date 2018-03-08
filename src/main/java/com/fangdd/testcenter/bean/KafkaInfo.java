@@ -26,10 +26,13 @@ public class KafkaInfo {
 	 * kafka_topic
 	 */
 	private String kafkaTopic;
+	
 	/**
 	 * kafkaInfo录入时间
 	 */
 	private String createTime;
+
+
 
 	public long getKafkaInfoId() {
 		return kafkaInfoId;

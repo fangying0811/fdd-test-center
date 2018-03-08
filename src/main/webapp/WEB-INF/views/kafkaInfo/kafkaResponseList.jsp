@@ -39,18 +39,31 @@
 					onvaluechanged="onSearchHistory"/></td>
 			</tr>
 			<tr>
-			<td style="text-align:left;" colspan="3"><label for="resource">requestJson：</label>
+				<td colspan="3" style="text-align:left;">
+					<label for="describes" >描述：</label>
+					<input id="describes" name="describes" class="mini-textbox"
+					allowInput="true" emptyText="请输入kafka消息描述" 
+					style="width:300px;"/>
+				</td>
+			</tr>
+			<tr>
+				<td style="text-align:left;" colspan="3">
+					<label for="resource">requestJson：</label>
 					<input id="requestJson" name="requestJson" class="mini-textarea"
 					allowInput="true" emptyText="请输入kafka消息内容" 
-					style="width:600px; height: 100px;"/></td>	
+					style="width:600px; height: 100px;"/>
+				</td>	
 			</tr>
+			
 		</table>
 	</div>
 	<div id="actionTb" class="mini-toolbar">
 		<table style="width:100%;">
 			<tr>
-				<td><a class="mini-button" iconCls="icon-search"
-					style="width:65px;" onclick="onSend">发送</a>
+				<td>
+					<a class="mini-button" iconCls="icon-search" style="width:65px;" onclick="onSend">发送</a>
+					<a class="mini-button" iconCls="icon-remove" onclick="remove">删除</a>
+					<a class="mini-button" iconCls="icon-edit" onclick="edit">编辑</a>
 				</td>
 			</tr>
 		</table>
@@ -64,6 +77,7 @@
 			totalField="data.totalElements" dataField="data.pageList" sizeList="[5,10]">
 			<div property="columns">
 				<div type="checkcolumn"></div>
+				<div field="describes" align="center" headerAlign="center">描述</div>
 				<div field="kafkaInfo.kafkaTopic" align="center" headerAlign="center">topic名称</div>
 				<div field="requestJson" align="center" headerAlign="center">请求消息</div>
 			</div>
@@ -77,9 +91,9 @@
 		var project = mini.get("projectId");
 		var kafkaInfo = mini.get("kafkaInfoId");
 		var requestJson=mini.get("requestJson");
+		var details=mini.get("describes");
 		var requirementInfoDg=mini.get("requirementInfoDg");
 		
-		var requirementInfoDg=mini.get("requirementInfoDg");
 		
 		function onTeamChanged(e) {
             var teamId=team.getValue();
@@ -103,9 +117,9 @@
 				url: '<%=basePath%>kafkaResponse/SendKafka',
 						type: "post",
 						data: searchForm.getData(true, false),
-						success: function (data) {  
-							if (data != '') {
-								mini.alert("发送结果:"+data);
+						success: function (datas) {  
+							if (datas != '') {
+								mini.alert("发送结果:"+datas);
 								onSearchHistory();
 							}
 							
@@ -123,12 +137,79 @@
 		function onCancel() {
 			searchForm.reset();
 		}
-		
+		//选中默认触发的回填操作
 		function selectionChanged(){
 			var row = requirementInfoDg.getSelected();
 			if (row) {
-				var requestJsonValue = row.requestJson;
-				requestJson.setValue(requestJsonValue);
+				requestJson.setValue(row.requestJson);
+				details.setValue(row.describes);
+			}
+		}
+		//删除
+		function remove() {
+			var row = requirementInfoDg.getSelected();
+			if (row) {
+				mini.confirm(
+								'您确定要删除吗？',
+								'系统提示',
+								function(action) {
+									if (action == 'ok') {
+										var kafkaResponseId = row.kafkaResponseId;
+										$.ajax({
+													url : '<%=basePath%>kafkaResponse/deleteKafkaResponse.json',
+													type : 'post',
+													data : {
+														kafkaResponseId : kafkaResponseId
+													},
+													success : function(data) {
+														if (data.code==200 && data.data) {
+															mini.alert("删除成功");
+															requirementInfoDg.reload();
+														} else if (!isEmpty(data.msg)){
+															mini.alert(data.msg);
+														}else {
+															if (isEmpty(data.msg)){
+																mini.alert("删除失败");
+															}
+														}
+													},
+													dataType : 'json'
+												});
+									}
+								});
+			} else {
+				mini.alert("请选中一条记录");
+			}
+		}
+		
+		function edit() {
+			var row = requirementInfoDg.getSelected();
+			if (row) {
+				var  kafkaResponseId= row.kafkaResponseId;
+				mini.open({
+							url : '<%=basePath%>kafkaResponse/editResponseInfoUI',
+							title : '修改请求消息或描述',
+							width : 800,
+							height : 257,
+							showMaxButton : true,
+							allowResize : false,
+							onload : function() {
+								var iframe = this.getIFrameEl();
+								iframe.contentWindow.init(kafkaResponseId);
+							},
+							ondestroy : function(action) {
+								if (action == 'ok') {
+									mini.alert("修改成功");
+									requirementInfoDg.reload();
+								} else if (action != 'close' && !isEmpty(action)) {
+									mini.alert(action);
+								}else if (action != 'close' && isEmpty(action)){
+									mini.alert("修改失败");
+								}
+							}
+						});
+			} else {
+				mini.alert("请选中一条记录");
 			}
 		}
 	</script>

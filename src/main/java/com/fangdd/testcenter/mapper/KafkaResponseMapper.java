@@ -17,4 +17,10 @@ public interface KafkaResponseMapper {
 	
 	public int getKafkaResponseByJson(@Param("kafkaResponse") KafkaResponse KafkaResponse);
 	
+	public int deleteKafkaResponse(long kafkaResponseId);
+	
+	public KafkaResponse getKafkaResponseByID(long kafkaResponseId);
+	
+	public int updateKafkaResponseInfo(@Param("kafkaResponse") KafkaResponse KafkaResponse);
+	
 }

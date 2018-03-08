@@ -21,7 +21,7 @@
 				<td style="text-align: left;"><label for="project"> 小组：</label>
 					<input id="teamId" name="team.teamId"
 					class="mini-combobox"
-					url="<%=basePath%>team/teamListByDepartmentId.json"
+					url="<%=path%>/team/teamListByDepartmentId.json"
 					dataField="data" valueField="teamId" textField="name" allowInput="true"
 					onvaluechanged="onTeamChanged" 
 					emptyText="支持按小组查询" style="width: 120px;"/></td>
@@ -59,7 +59,6 @@
 			totalField="data.totalElements" dataField="data.pageList" sizeList="[5,10]">
 			<div property="columns">
 				<div type="checkcolumn"></div>
-				<div field="kafkaInfoId" align="center" headerAlign="center">ID</div>
 				<div field="team.name" align="center" headerAlign="center">小组</div>
 				<div field="project.projectName" align="center" headerAlign="center">项目</div>
 				<div field="kafkaTopic" align="center" headerAlign="center">kafka_topic</div>
@@ -125,12 +124,9 @@
 							if (action == 'ok') {
 								mini.alert("添加成功");
 								kafkaInfoDg.reload();
-							} else if (action != 'close' && !isEmpty(action)) {
-								mini.alert(action);
-							}else {
-								if (action != 'close' && isEmpty(action)){
-									mini.alert("添加失败");
-								}
+						 	} 
+							else if  (action != 'close' && isEmpty(action)){
+								mini.alert("topic 已存在");
 							}
 						}
 					});
@@ -146,7 +142,7 @@
 							url : '<%=basePath%>kafkaInfo/editKafkaInfoUI',
 							title : '修改kafkaTopic',
 							width : 800,
-							height : 200,
+							height : 210,
 							showMaxButton : true,
 							allowResize : false,
 							onload : function() {
@@ -159,10 +155,8 @@
 									kafkaInfoDg.reload();
 								} else if (action != 'close' && !isEmpty(action)) {
 									mini.alert(action);
-								}else {
-									if (action != 'close' && isEmpty(action)){
-										mini.alert("修改失败");
-									}
+								}else if (action != 'close' && isEmpty(action)){
+									mini.alert("修改失败");
 								}
 							}
 						});

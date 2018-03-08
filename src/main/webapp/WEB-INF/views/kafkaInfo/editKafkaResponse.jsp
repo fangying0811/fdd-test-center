@@ -14,42 +14,36 @@
 	<div id="editForm" style="padding:15px">
 		<table border="0" style="width: 100%">
 			<tr>
-				<td><input id="kafkaInfoId" name="kafkaInfoId" class="mini-hidden" /></td>
+				<td><input id="kafkaResponseId" name="kafkaResponseId" class="mini-hidden" /></td>
 			</tr>
 			<tr>
-				<td style="text-align: right;"><label for="project">小组：<span
-						style="color:red">(*)</span>：
+				<td style="text-align: right;"><label for="kafkaTopic">topic名称：
 				</label></td>
-				<td><input id="teamId" name="team.teamId" class="mini-combobox"
-					url="<%=basePath%>team/teamListByDepartmentId.json"
-					dataField="data" valueField="teamId" textField="name" allowInput="true"
-					onvaluechanged="onTeamChanged" required="true" onvalidation="onValidation"
-					emptyText="请选择小组" requiredErrorText="请选择小组" style="width: 200px;"/></td>
-				<td><div id="teamId_error"></div></td>
+				<td><input id="kafkaInfoId" name="kafkaInfo.kafkaTopic" class="mini-textbox"  allowInput="false"
+				   style="width: 300px;"/></td>
+				<td></td>
 				<td>&nbsp;</td>
 			</tr>
 			<tr>
-				<td style="text-align: right;"><label for="project">项目<span
-						style="color:red">(*)</span>：
-				</label></td>
-				<td><input id="projectId" name="project.projectId" class="mini-combobox"
-					url="<%=basePath%>projectInfo/projectInfoListByTeamId.json"
-					dataField="data" valueField="projectId" textField="projectName" allowInput="true"
-					valueFromSelect="true" required="true" onvalidation="onValidation"
-					errorMode="none" requiredErrorText="请选择项目" emptyText="请选择项目"
-					style="width:300px;" /></td>
-				<td><div id="projectId_error"></div></td>
+				<td style="text-align: right;">
+					<label for="describes">描述：</label>
+				</td>
+				<td>
+					<input id="describes" name="describes" class="mini-textbox"
+					allowInput="true" style="width:300px;"/>
+				</td>
+				<td></td>
 				<td>&nbsp;</td>
 			</tr>
 			<tr>
-				<td style="text-align: right;"><label for="kafkaTopic">kafka_topic<span
+				<td style="text-align: right;"><label for="requestJson">请求消息<span
 						style="color:red">(*)</span>：
 				</label></td>
-				<td><input id="kafkaTopic" name="kafkaTopic"
-					class="mini-textbox" emptyText="请输入 topic" vtype="remote"
+				<td><input id="requestJson" name="requestJson" class="mini-textarea"  allowInput="true"
+					emptyText="请输入请求消息" vtype="remote"
 					required="true" onvalidation="onValidation" errorMode="none"
-					requiredErrorText="topic名称不能为空" style="width:300px;" /></td>
-				<td><div id="kafkaTopic_error"></div></td>
+					requiredErrorText="请求消息不能为空" style="width:500px; height: 100px;" /></td>
+				<td><div id="requestJson_error"></div></td>
 				<td>&nbsp;</td>
 			</tr>
 		</table>
@@ -65,31 +59,24 @@
 	<script type="text/javascript">
 		mini.parse();
 		var form = new mini.Form('editForm');
-		var team =  mini.get("teamId");
-		var project = mini.get("projectId");
 	
-		var _data;
 		//初始化表单数据
-		function init(kafkaInfoId) {
+		function init(kafkaResponseId) {
 			$
 					.ajax({
-						url : '<%=basePath%>kafkaInfo/kafkaInfo.json',
+						url : '<%=basePath%>kafkaResponse/kafkaResponseByID.json',
 						type : 'get',
 						data : {
-							kafkaInfoId : kafkaInfoId
+							kafkaResponseId : kafkaResponseId
 						},
 						success : function(data) {
-							var teamId=data.data.team.teamId;
-							project.setValue();
-				            var url="<%=basePath%>projectInfo/projectInfoListByTeamId.json?teamId="+teamId;
-				            project.setUrl(url);
 							form.setData(data.data);
 							form.setChanged(false);
 						},
 						dataType : 'json'
 					});
 		}
-		
+			
 		function onCancel() {
 			closeWindow('close');
 			return;
@@ -110,7 +97,7 @@
 
 			$
 					.ajax({
-						url : '<%=basePath%>kafkaInfo/editKafka.json',
+						url : '<%=basePath%>kafkaResponse/editKafkaResponse.json',
 						type : 'post',
 						data : form.getData(true, false),
 						success : function(data) {
@@ -125,12 +112,6 @@
 					});
 		}
 		
-		function onTeamChanged(e) {
-            var teamId=team.getValue();
-            project.setValue();
-            var url="<%=basePath%>projectInfo/projectInfoListByTeamId.json?teamId="+teamId;
-            project.setUrl(url);
-		}
 	</script>
 </body>
 </html>

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -34,6 +35,11 @@ public class KafkaResponseController extends AbstractController {
 		return new ModelAndView("views/kafkaInfo/kafkaResponseList");
 	}
 	
+	@RequestMapping(value="/editResponseInfoUI")
+	public ModelAndView EditKafkaResponse(){
+		return new ModelAndView("views/kafkaInfo/editKafkaResponse");
+	}
+	
 	@ResponseBody
 	@RequestMapping(value = "/kafkaResponseList.json")
 	public HttpResult getKafkaResponseList(KafkaResponse kafkaResponse) {
@@ -56,13 +62,36 @@ public class KafkaResponseController extends AbstractController {
 		if(strRequestJson!=null&&!strRequestJson.equals("")){
 			HttpResponse res = HttpToolKit.invokePost("http://172.28.3.68:9096/mljr-data-center/test/kafka", params);
 			// 此Json未保存到对应的Topic中，将请求的消息体保存至数据库表中
-			
 			kafkaResponseService.addKafkaResponse(kafkaResponse);
-			
 			return res.getContent();
 		}else {
 			return "";
 		}
 	}
 	
+	@ResponseBody
+	@RequestMapping(value = "/deleteKafkaResponse.json")
+	public HttpResult DeleteKafkaResponse(@RequestParam(defaultValue = "0") long kafkaResponseId) {
+		boolean flag=kafkaResponseService.deleteKafkaResponse(kafkaResponseId);
+		return HttpResult.successWithData(flag);
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/kafkaResponseByID.json")
+	public HttpResult kafkaResponseByID(@RequestParam(defaultValue = "0") long kafkaResponseId) {
+		KafkaResponse kafkaResponse;
+		if (kafkaResponseId > 0) {
+			kafkaResponse = kafkaResponseService.getKafkaResponseById(kafkaResponseId);
+			return HttpResult.successWithData(kafkaResponse);
+		}else{
+			return null;
+		}
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/editKafkaResponse.json")
+	public HttpResult editKafka(KafkaResponse kafkaResponse) {
+		boolean flag = kafkaResponseService.updateKafkaResponseInfo(kafkaResponse);
+		return HttpResult.successWithData(flag);
+	}
 }

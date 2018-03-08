@@ -23,4 +23,6 @@ public interface KafkaInfoService {
 	
 	public List<KafkaInfo> getKafkaListByProjectId(long projectId);
 	
+	public int getKafkaNumByKafkaTopic(KafkaInfo kafkaInfo);
+	
 }

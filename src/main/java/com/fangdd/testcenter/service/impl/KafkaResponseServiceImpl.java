@@ -94,4 +94,36 @@ public class KafkaResponseServiceImpl implements KafkaResponseService {
 		return count;
 	}
 
+	@Override
+	public boolean deleteKafkaResponse(long kafkaResponseId) {
+		// TODO Auto-generated method stub
+		try {
+			return kafkaResponseMapper.deleteKafkaResponse(kafkaResponseId) == 1;
+		} catch (Exception e) {
+			throw new BusinessException(SystemErrorCodeConstant.DELETE_FAILURE, e);
+		}
+	}
+
+	@Override
+	public KafkaResponse getKafkaResponseById(long kafkaResponseId){
+		// TODO Auto-generated method stub
+		KafkaResponse kafkaResponse;
+		try {
+			kafkaResponse = kafkaResponseMapper.getKafkaResponseByID(kafkaResponseId);
+		} catch (Exception e) {
+			throw new BusinessException(SystemErrorCodeConstant.QUERY_FAILURE, e);
+		}
+		return kafkaResponse;
+	}
+
+	@Override
+	public boolean updateKafkaResponseInfo(KafkaResponse KafkaResponse) {
+		// TODO Auto-generated method stub
+		try {
+			return kafkaResponseMapper.updateKafkaResponseInfo(KafkaResponse) == 1;
+		} catch (Exception e) {
+			throw new BusinessException(SystemErrorCodeConstant.UPDATE_FAILURE, e);
+		}
+	}
+
 }

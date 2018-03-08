@@ -19,4 +19,10 @@ public interface KafkaResponseService {
 	public int getKafkaResponseCount(KafkaResponse KafkaResponse);
 	
 	public int getKafkaResponseCountByJson(KafkaResponse KafkaResponse);
+	
+	public boolean deleteKafkaResponse(long kafkaResponseId);
+	
+	public KafkaResponse getKafkaResponseById(long kafkaResponseId);
+	
+	public boolean updateKafkaResponseInfo(KafkaResponse KafkaResponse);
 }

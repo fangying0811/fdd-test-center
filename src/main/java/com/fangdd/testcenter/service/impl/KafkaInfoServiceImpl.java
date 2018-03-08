@@ -122,4 +122,15 @@ public class KafkaInfoServiceImpl implements KafkaInfoService {
 		}
 	}
 
+	@Override
+	public int getKafkaNumByKafkaTopic(KafkaInfo kafkaInfo) {
+		// TODO Auto-generated method stub
+		try {
+			return kafkaInfoMapper.getKafkaNumByKafkaTopic(kafkaInfo);
+			
+		} catch (Exception e) {
+			throw new BusinessException(SystemErrorCodeConstant.QUERY_FAILURE, e);
+		}
+	}
+
 }

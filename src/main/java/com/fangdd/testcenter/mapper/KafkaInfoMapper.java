@@ -23,5 +23,5 @@ public interface KafkaInfoMapper {
 	
 	public List<KafkaInfo> getKafkaByProjectId(@Param("projectId") long projectId);
 	
-	
+	public int getKafkaNumByKafkaTopic(@Param("kafkaInfo") KafkaInfo kafkaInfo);
 }

@@ -153,5 +153,11 @@
 		t_kafka_manage.project_id=#{projectId}
 	</select>
 	
-	
+	<select id="getKafkaNumByKafkaTopic" resultType="int">
+		select count(1)
+		from t_kafka_manage
+		where
+		t_kafka_manage.kafka_topic
+		=#{kafkaInfo.kafkaTopic}
+	</select>
 </mapper>

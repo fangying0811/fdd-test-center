@@ -17,6 +17,10 @@ public class KafkaResponse {
 	 * 请求时间
 	 */
 	private String createTime;
+	/**
+	 * 描述
+	 */
+	private String describes;
 
 	public long getKafkaResponseId() {
 		return kafkaResponseId;
@@ -48,6 +52,14 @@ public class KafkaResponse {
 
 	public void setCreateTime(String createTime) {
 		this.createTime = createTime;
+	}
+
+	public String getDescribes() {
+		return describes;
+	}
+
+	public void setDescribes(String describes) {
+		this.describes = describes;
 	}
 
 }

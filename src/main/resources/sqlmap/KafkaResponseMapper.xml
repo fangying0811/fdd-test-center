@@ -5,6 +5,7 @@
 	<resultMap id="KafkaResponseResultMap" type="KafkaResponse">
 		<id property="kafkaResponseId" column="id" />
 		<result property="requestJson" column="request_json" />
+		<result property="describes" column="describes" />
 		<association property="kafkaInfo" javaType="KafkaInfo">
 			<id property="kafkaInfoId" column="kafkaInfoId" />
 			<result property="kafkaTopic" column="kafkaTopic" />
@@ -15,19 +16,21 @@
 		insert into t_kafka_response(
 		kafka_id,
 		request_json,
+		describes,
 		create_time
 		)
 		values(
 		#{kafkaResponse.kafkaInfo.kafkaInfoId},
 		#{kafkaResponse.requestJson},
+		#{kafkaResponse.describes},
 		NOW()
 		)
 	</insert>
-	
 	<sql id="KafkaResponseColumnSQL">
 		t_kafka_response.id,
 		t_kafka_response.kafka_id,
 		t_kafka_response.request_json,
+		t_kafka_response.describes,
 		t_kafka_response.create_time
 	</sql>
 	
@@ -77,4 +80,30 @@
 		and t_kafka_response.request_json =#{kafkaResponse.requestJson}
 	</select>
 	
+	<select id="getKafkaResponseByID" resultMap="KafkaResponseResultMap">
+		select
+		<include refid="KafkaResponseColumnSQL" />
+		,
+		<include refid="KafkaInfoColumnSQL" />
+		<include refid="joinSql" />
+		where
+		t_kafka_response.id=#{kafkaResponseId}
+	</select>
+	
+	<delete id="deleteKafkaResponse">
+		delete from
+		t_kafka_response
+		where
+		t_kafka_response.id=#{kafkaResponseId}
+	</delete>
+	
+	<update id="updateKafkaResponseInfo">
+		update t_kafka_response
+		set
+		t_kafka_response.request_json=#{kafkaResponse.requestJson},
+		t_kafka_response.describes=#{kafkaResponse.describes}
+		where
+		t_kafka_response.id
+		=#{kafkaResponse.kafkaResponseId}
+	</update>
 </mapper>

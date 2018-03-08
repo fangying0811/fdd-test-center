@@ -50,9 +50,13 @@ public class KafkaInfoController extends AbstractController {
 	@ResponseBody
 	@RequestMapping(value = "/addKafkaInfo.json")
 	public HttpResult addKafka(KafkaInfo kafkaInfo) {
-
-		boolean flag = kafkaInfoService.addKafkaInfo(kafkaInfo);
-		return HttpResult.successWithData(flag);
+		int num=kafkaInfoService.getKafkaNumByKafkaTopic(kafkaInfo);
+		if(num>0){
+			return HttpResult.successWithData(null);
+		}else{
+			boolean flag = kafkaInfoService.addKafkaInfo(kafkaInfo);
+			return HttpResult.successWithData(flag);
+		}
 	}
 
 	@ResponseBody
@@ -86,6 +90,5 @@ public class KafkaInfoController extends AbstractController {
 			return null;
 		}
 	}
-
 
 }
